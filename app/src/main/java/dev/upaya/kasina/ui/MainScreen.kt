@@ -4,38 +4,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 
 
 @Composable
 fun MainScreen() {
+
+    val viewModel: MainViewModel = viewModel()
+
     FlashKasinaTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
+            TextButton(
+                onClick = viewModel::toggleFlashLight,
                 modifier = Modifier.padding(innerPadding)
-            )
+            ) {
+                Text(text = "Flash!")
+            }
         }
-    }
-}
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    FlashKasinaTheme {
-        Greeting("Android")
     }
 }
