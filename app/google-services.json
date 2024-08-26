@@ -1,0 +1,105 @@
+{
+  "project_info": {
+    "project_number": "993544001537",
+    "project_id": "upaya-dev",
+    "storage_bucket": "upaya-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993544001537:android:f51cad76a3563153834800",
+        "android_client_info": {
+          "package_name": "dev.upaya.eprc.entrain"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "993544001537-toommaln6tr6g6aluuj7tspp5ttft8lp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoccfztznIpq8m9AAIRCGfXzXsFciKadI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "993544001537-ktuc2e8hf74q6qsv5pq1vpi3vij1ie77.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993544001537:android:7496a6a0e09166f7834800",
+        "android_client_info": {
+          "package_name": "dev.upaya.kasina"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "993544001537-03kohgo7r7s83pkm82eg3cep5c7lm443.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dev.upaya.kasina",
+            "certificate_hash": "dad3c014f6c35dbbcdd267cc2c83bfa1b4106f79"
+          }
+        },
+        {
+          "client_id": "993544001537-toommaln6tr6g6aluuj7tspp5ttft8lp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoccfztznIpq8m9AAIRCGfXzXsFciKadI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "993544001537-ktuc2e8hf74q6qsv5pq1vpi3vij1ie77.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993544001537:android:82f46d50e96a4f04834800",
+        "android_client_info": {
+          "package_name": "dev.upaya.shf"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "993544001537-toommaln6tr6g6aluuj7tspp5ttft8lp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoccfztznIpq8m9AAIRCGfXzXsFciKadI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "993544001537-ktuc2e8hf74q6qsv5pq1vpi3vij1ie77.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
