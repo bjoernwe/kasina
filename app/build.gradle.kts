@@ -1,8 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("com.google.gms.google-services")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
     id("com.google.firebase.crashlytics")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -61,12 +63,15 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
+    implementation(libs.hilt.android)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
+
+    kapt(libs.hilt.android.compiler)
 
     testImplementation(libs.junit)
 
@@ -77,4 +82,9 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+kapt {
+    // Allow references to generated code
+    correctErrorTypes = true
 }
