@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import dagger.hilt.android.AndroidEntryPoint
 import dev.upaya.kasina.ui.MainScreen
+import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 import javax.inject.Inject
 
 
@@ -22,7 +23,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MainScreen()
+            FlashKasinaTheme(darkTheme = true) {
+                MainScreen()
+            }
         }
     }
 
