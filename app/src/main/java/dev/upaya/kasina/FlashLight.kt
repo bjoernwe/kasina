@@ -18,6 +18,8 @@ class FlashLight @Inject constructor(
     @ApplicationContext context: Context,
 ) {
 
+    private var isOn = false
+
     private val cameraManager = context.getSystemService(CAMERA_SERVICE) as CameraManager
     private val cameraId = cameraManager.cameraIdList.first { id ->
         cameraManager.getCameraCharacteristics(id)[CameraCharacteristics.FLASH_INFO_AVAILABLE] == true
@@ -26,12 +28,22 @@ class FlashLight @Inject constructor(
     private val firebaseAnalytics: FirebaseAnalytics = Firebase.analytics
 
     fun turnOn() {
-        cameraManager.setTorchMode(cameraId, true)
+
+        if (isOn) return
+
+        isOn = true
+
+        cameraManager.setTorchMode(cameraId, isOn)
         firebaseAnalytics.logEvent("flashlight_on") { }
     }
 
     fun turnOff() {
-        cameraManager.setTorchMode(cameraId, false)
+
+        if (!isOn) return
+
+        isOn = false
+
+        cameraManager.setTorchMode(cameraId, isOn)
         firebaseAnalytics.logEvent("flashlight_off") { }
     }
 }
