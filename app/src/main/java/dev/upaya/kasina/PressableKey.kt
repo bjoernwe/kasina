@@ -27,7 +27,7 @@ class PressableKey(private val longPressThresholdMillis: Long) {
         pressState = PressState.SHORT_PRESSED
 
         scope.launch {
-            waitAndCallCallback(shortPressCallback = shortPressCallback, longPressCallback = longPressCallback)
+            pressState = waitAndCallCallback(shortPressCallback = shortPressCallback, longPressCallback = longPressCallback)
         }
     }
 
@@ -45,13 +45,14 @@ class PressableKey(private val longPressThresholdMillis: Long) {
     private suspend fun waitAndCallCallback(
         shortPressCallback: () -> Unit,
         longPressCallback: () -> Unit,
-    ) {
+    ): PressState {
         delay(longPressThresholdMillis)
-        if (pressed) {
-            pressState = PressState.LONG_PRESSED
+        return if (pressed) {
             longPressCallback()
+            PressState.LONG_PRESSED
         } else {
             shortPressCallback()
+            PressState.SHORT_PRESSED
         }
     }
 }
