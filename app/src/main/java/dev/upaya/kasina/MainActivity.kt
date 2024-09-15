@@ -6,9 +6,11 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import dev.upaya.kasina.ui.MainScreen
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -36,7 +38,9 @@ class MainActivity : ComponentActivity() {
             return super.onKeyDown(keyCode, event)
 
         if (keyCode in volumeKeys) {
-            flashLight.turnOn()
+            lifecycleScope.launch {
+                flashLight.turnOnFor(3000L)
+            }
             return true
         }
 
@@ -44,12 +48,6 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-
-        if (keyCode in volumeKeys) {
-            flashLight.turnOff()
-            return true
-        }
-
         return super.onKeyUp(keyCode, event)
     }
 

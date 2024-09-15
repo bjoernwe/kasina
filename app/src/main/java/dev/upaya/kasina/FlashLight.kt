@@ -9,6 +9,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,7 +17,7 @@ import javax.inject.Singleton
 @Singleton
 class FlashLight @Inject constructor(
     @ApplicationContext context: Context,
-) {
+) : AutoCloseable {
 
     private var isOn = false
 
@@ -27,23 +28,46 @@ class FlashLight @Inject constructor(
 
     private val firebaseAnalytics: FirebaseAnalytics = Firebase.analytics
 
-    fun turnOn() {
+    init {
+        cameraManager.registerTorchCallback(object : CameraManager.TorchCallback() {
+            override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
+                isOn = enabled
+            }
+        }, null)
+    }
 
-        if (isOn) return
+    override fun close() {
+        turnOff()
+    }
 
-        isOn = true
+    private fun turnOn() {
 
-        cameraManager.setTorchMode(cameraId, isOn)
+        if (isOn)
+            return
+
+        cameraManager.setTorchMode(cameraId, true)
         firebaseAnalytics.logEvent("flashlight_on") { }
     }
 
-    fun turnOff() {
+    private fun turnOff() {
 
-        if (!isOn) return
+        if (!isOn)
+            return
 
-        isOn = false
-
-        cameraManager.setTorchMode(cameraId, isOn)
+        cameraManager.setTorchMode(cameraId, false)
         firebaseAnalytics.logEvent("flashlight_off") { }
+    }
+
+    suspend fun turnOnFor(timeMillis: Long) {
+
+        if (isOn)
+            return
+
+        turnOn()
+        try {
+            delay(timeMillis)
+        } finally {
+            turnOff()
+        }
     }
 }
