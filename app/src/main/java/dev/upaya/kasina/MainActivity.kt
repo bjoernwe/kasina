@@ -10,6 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import dev.upaya.kasina.ui.MainScreen
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -17,6 +19,7 @@ class MainActivity : ComponentActivity() {
 
     private val volumeKeys = setOf(KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP)
     private lateinit var inputKeyHandlerResource: InputKeyHandlerResource
+    private lateinit var flashLightControllerResource: FlashLightControllerResource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,13 +31,27 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun onVolumeDownShortPress() {
+        flashLightControllerResource.toggle()
+    }
+
+    private fun onVolumeDownLongPress(scope: CoroutineScope) {
+        scope.launch {
+            flashLightControllerResource.turnOnFor(timeMillis = 1000)
+        }
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
         if (keyCode == KeyEvent.KEYCODE_BACK)
             return super.onKeyDown(keyCode, event)
 
         if (keyCode in volumeKeys) {
-            inputKeyHandlerResource.handleVolumeDownPress(lifecycleScope)
+            inputKeyHandlerResource.handleVolumeDownPress(
+                shortPressCallback = { onVolumeDownShortPress() },
+                longPressCallback = { onVolumeDownLongPress(lifecycleScope) },
+                scope = lifecycleScope,
+            )
             return true
         }
 
@@ -52,6 +69,7 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         inputKeyHandlerResource = InputKeyHandlerResource(this)
+        flashLightControllerResource = FlashLightControllerResource(this)
     }
 
     override fun onPause() {
@@ -67,5 +85,6 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         inputKeyHandlerResource.close()
+        flashLightControllerResource.close()
     }
 }
