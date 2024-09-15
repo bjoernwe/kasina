@@ -1,29 +1,50 @@
 package dev.upaya.kasina.ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import dev.upaya.kasina.R
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 
 
 @Composable
 fun MainScreen() {
 
-    val viewModel: MainViewModel = viewModel()
-
-    FlashKasinaTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            TextButton(
-                onClick = viewModel::toggleFlashLight,
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                Text(text = "Flash!")
-            }
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+        ) {
+            Image(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxSize(.5f)
+                    .aspectRatio(1f),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
+                painter = painterResource(R.drawable.baseline_lightbulb_circle_24),
+                contentDescription = "Lightbulb",
+            )
         }
+    }
+}
+
+
+@Preview
+@Composable
+fun MainScreenPreview() {
+    FlashKasinaTheme(darkTheme = true) {
+        MainScreen()
     }
 }
