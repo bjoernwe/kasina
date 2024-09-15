@@ -22,8 +22,11 @@ class InputKeyHandlerResource(appContext: Context) : AutoCloseable {
         )
     }
 
-    fun handleVolumeDownRelease() {
-        volumeDownKey.release()
+    /**
+     * @return the previous press state
+     */
+    fun handleVolumeDownRelease(): PressState {
+        return volumeDownKey.release()
     }
 
     override fun close() {

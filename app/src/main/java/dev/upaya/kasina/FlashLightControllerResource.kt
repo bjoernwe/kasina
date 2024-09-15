@@ -8,8 +8,20 @@ class FlashLightControllerResource(context: Context) : AutoCloseable {
 
     private val flashLightResource = FlashLightResource(context)
 
+    fun turnOn() {
+        flashLightResource.turnOn()
+    }
+
+    fun turnOff() {
+        flashLightResource.turnOff()
+    }
+
     fun toggle() {
-        flashLightResource.toggle()
+        if (flashLightResource.isOn) {
+            flashLightResource.turnOff()
+        } else {
+            flashLightResource.turnOn()
+        }
     }
 
     suspend fun turnOnFor(timeMillis: Long) {

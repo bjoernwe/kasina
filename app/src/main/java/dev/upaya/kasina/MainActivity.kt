@@ -10,8 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import dev.upaya.kasina.ui.MainScreen
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -35,10 +33,13 @@ class MainActivity : ComponentActivity() {
         flashLightControllerResource.toggle()
     }
 
-    private fun onVolumeDownLongPress(scope: CoroutineScope) {
-        scope.launch {
-            flashLightControllerResource.turnOnFor(timeMillis = 1000)
-        }
+    private fun onVolumeDownLongPress() {
+        flashLightControllerResource.turnOn()
+    }
+
+    private fun onVolumeDownRelease(previousPressState: PressState) {
+        if (previousPressState == PressState.LONG_PRESSED)
+            flashLightControllerResource.turnOff()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -48,8 +49,8 @@ class MainActivity : ComponentActivity() {
 
         if (keyCode in volumeKeys) {
             inputKeyHandlerResource.handleVolumeDownPress(
-                shortPressCallback = { onVolumeDownShortPress() },
-                longPressCallback = { onVolumeDownLongPress(lifecycleScope) },
+                shortPressCallback = ::onVolumeDownShortPress,
+                longPressCallback = ::onVolumeDownLongPress,
                 scope = lifecycleScope,
             )
             return true
@@ -60,7 +61,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode in volumeKeys) {
-            inputKeyHandlerResource.handleVolumeDownRelease()
+            val previousPressState = inputKeyHandlerResource.handleVolumeDownRelease()
+            onVolumeDownRelease(previousPressState)
             return true
         }
         return super.onKeyUp(keyCode, event)

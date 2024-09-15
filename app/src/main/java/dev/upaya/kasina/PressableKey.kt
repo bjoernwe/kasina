@@ -5,26 +5,41 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
+enum class PressState {
+    RELEASED,
+    SHORT_PRESSED,
+    LONG_PRESSED,
+}
+
+
 class PressableKey(private val longPressThresholdMillis: Long) {
 
-    private var pressed = false
+    private var pressState = PressState.RELEASED
+
+    private val pressed
+        get() = pressState != PressState.RELEASED
 
     fun press(shortPressCallback: () -> Unit, longPressCallback: () -> Unit, scope: CoroutineScope) {
 
         if (pressed)
             return
 
-        pressed = true
+        pressState = PressState.SHORT_PRESSED
 
         scope.launch {
             waitAndCallCallback(shortPressCallback = shortPressCallback, longPressCallback = longPressCallback)
         }
     }
 
-    fun release() {
+    /**
+     * @return the previous press state
+     */
+    fun release(): PressState {
         if (!pressed)
-            return
-        pressed = false
+            return PressState.RELEASED
+        val previousPressState = pressState
+        pressState = PressState.RELEASED
+        return previousPressState
     }
 
     private suspend fun waitAndCallCallback(
@@ -33,6 +48,7 @@ class PressableKey(private val longPressThresholdMillis: Long) {
     ) {
         delay(longPressThresholdMillis)
         if (pressed) {
+            pressState = PressState.LONG_PRESSED
             longPressCallback()
         } else {
             shortPressCallback()

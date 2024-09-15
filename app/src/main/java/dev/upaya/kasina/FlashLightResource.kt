@@ -8,10 +8,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
-import javax.inject.Inject
 
 
-class FlashLightResource @Inject constructor(context: Context) : AutoCloseable {
+class FlashLightResource(context: Context) : AutoCloseable {
 
     private var _isOn = false
     val isOn: Boolean
@@ -57,12 +56,5 @@ class FlashLightResource @Inject constructor(context: Context) : AutoCloseable {
 
         cameraManager.setTorchMode(cameraId, false)
         firebaseAnalytics.logEvent("flashlight_off") { }
-    }
-
-    fun toggle() {
-        if (_isOn)
-            turnOff()
-        else
-            turnOn()
     }
 }
