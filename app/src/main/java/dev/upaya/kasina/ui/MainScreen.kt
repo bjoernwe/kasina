@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,14 +25,14 @@ fun MainScreen() {
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(Color(12, 12, 12))
         ) {
             Image(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .fillMaxSize(.5f)
                     .aspectRatio(1f),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
+                colorFilter = ColorFilter.tint(Color(192, 37, 88)),
                 painter = painterResource(R.drawable.baseline_lightbulb_circle_24),
                 contentDescription = "Lightbulb",
             )
