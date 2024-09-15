@@ -10,17 +10,13 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import dev.upaya.kasina.ui.MainScreen
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var flashLight: FlashLight
-
     private val volumeKeys = setOf(KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP)
+    private lateinit var inputKeyHandlerResource: InputKeyHandlerResource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,9 +34,7 @@ class MainActivity : ComponentActivity() {
             return super.onKeyDown(keyCode, event)
 
         if (keyCode in volumeKeys) {
-            lifecycleScope.launch {
-                flashLight.turnOnFor(3000L)
-            }
+            inputKeyHandlerResource.handleVolumeDownPress(lifecycleScope)
             return true
         }
 
@@ -48,7 +42,21 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode in volumeKeys) {
+            inputKeyHandlerResource.handleVolumeDownRelease()
+            return true
+        }
         return super.onKeyUp(keyCode, event)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        inputKeyHandlerResource = InputKeyHandlerResource(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onResume() {
@@ -56,8 +64,8 @@ class MainActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
-    override fun onPause() {
-        super.onPause()
-        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    override fun onStop() {
+        super.onStop()
+        inputKeyHandlerResource.close()
     }
 }
