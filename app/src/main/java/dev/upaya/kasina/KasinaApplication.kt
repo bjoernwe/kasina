@@ -6,7 +6,7 @@ import timber.log.Timber
 
 
 @HiltAndroidApp
-class FlashApplication : Application() {
+class KasinaApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
