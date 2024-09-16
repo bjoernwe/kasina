@@ -57,4 +57,12 @@ class FlashLightResource(context: Context) : AutoCloseable {
         cameraManager.setTorchMode(cameraId, false)
         firebaseAnalytics.logEvent("flashlight_off") { }
     }
+
+    fun toggle() {
+        if (isOn) {
+            turnOff()
+        } else {
+            turnOn()
+        }
+    }
 }

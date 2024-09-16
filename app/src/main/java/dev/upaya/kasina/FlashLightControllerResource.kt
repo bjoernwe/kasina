@@ -17,11 +17,7 @@ class FlashLightControllerResource(context: Context) : AutoCloseable {
     }
 
     fun toggle() {
-        if (flashLightResource.isOn) {
-            flashLightResource.turnOff()
-        } else {
-            flashLightResource.turnOn()
-        }
+        flashLightResource.toggle()
     }
 
     suspend fun turnOnFor(timeMillis: Long) {
