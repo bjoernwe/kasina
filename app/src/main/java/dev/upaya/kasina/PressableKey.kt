@@ -52,7 +52,7 @@ class PressableKey(private val longPressThresholdMillis: Long) {
             PressState.LONG_PRESSED
         } else {
             shortPressCallback()
-            PressState.SHORT_PRESSED
+            PressState.RELEASED
         }
     }
 }
