@@ -21,7 +21,8 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var inputKeyHandler: InputKeyHandler
 
-    private lateinit var flashLightStateControllerResource: FlashLightStateControllerResource
+    @Inject
+    lateinit var flashLightStateControllerResource: FlashLightStateControllerResource
 
     private val volumeKeys = setOf(KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP)
 
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        flashLightStateControllerResource = FlashLightStateControllerResource(this, inputKeyHandler, lifecycleScope)
+        flashLightStateControllerResource.start(this, lifecycleScope)
     }
 
     override fun onPause() {

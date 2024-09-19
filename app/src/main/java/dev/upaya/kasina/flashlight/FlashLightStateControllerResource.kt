@@ -5,46 +5,47 @@ import dev.upaya.kasina.inputkeys.InputKeyHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-class FlashLightStateControllerResource(
-    context: Context,
+class FlashLightStateControllerResource @Inject constructor(
     private val inputKeyHandler: InputKeyHandler,
-    scope: CoroutineScope
 ) : AutoCloseable {
 
     private var flashLightState = FlashLightState.OFF
-    private val flashLightResource = FlashLightResource(context)
+    private var flashLightResource: FlashLightResource? = null
 
-    private var collectReleaseEventsJob: Job
-    private var collectLongPressEventsJob: Job
-    private var collectShortPressEventsJob: Job
+    private var collectReleaseEventsJob: Job? = null
+    private var collectLongPressEventsJob: Job? = null
+    private var collectShortPressEventsJob: Job? = null
 
-    init {
+    fun start(context: Context, scope: CoroutineScope) {
+        flashLightResource = FlashLightResource(context)
         collectReleaseEventsJob = scope.launch { collectVolumeReleaseEvents() }
         collectLongPressEventsJob = scope.launch { collectVolumeLonPressEvents() }
         collectShortPressEventsJob = scope.launch { collectVolumeShortPressEvents() }
     }
 
     override fun close() {
-        collectReleaseEventsJob.cancel()
-        collectLongPressEventsJob.cancel()
-        collectShortPressEventsJob.cancel()
-        flashLightResource.close()
+        turnOff()
+        collectReleaseEventsJob?.cancel()
+        collectLongPressEventsJob?.cancel()
+        collectShortPressEventsJob?.cancel()
+        flashLightResource?.close()
     }
 
     private fun turnOff() {
-        flashLightResource.turnOff()
+        flashLightResource?.turnOff()
         flashLightState = FlashLightState.OFF
     }
 
     private fun holdOn() {
-        flashLightResource.turnOn()
+        flashLightResource?.turnOn()
         flashLightState = FlashLightState.ON_HOLD
     }
 
     private fun switchOn() {
-        flashLightResource.turnOn()
+        flashLightResource?.turnOn()
         flashLightState = FlashLightState.ON_SWITCHED
     }
 
