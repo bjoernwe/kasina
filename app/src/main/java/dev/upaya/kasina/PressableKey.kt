@@ -1,8 +1,12 @@
 package dev.upaya.kasina
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 
 enum class PressState {
@@ -14,44 +18,49 @@ enum class PressState {
 
 class PressableKey(private val longPressThresholdMillis: Long) {
 
+    private val _shortPressed = MutableSharedFlow<Instant>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _longPressed = MutableSharedFlow<Instant>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _released = MutableSharedFlow<Instant>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val shortPressed: SharedFlow<Instant> = _shortPressed
+    val longPressed: SharedFlow<Instant> = _longPressed
+    val released: SharedFlow<Instant> = _released
+
     private var pressState = PressState.RELEASED
 
-    private val pressed
+    private val isPressed
         get() = pressState != PressState.RELEASED
 
-    fun press(shortPressCallback: () -> Unit, longPressCallback: () -> Unit, scope: CoroutineScope) {
+    private val isReleased
+        get() = !isPressed
 
-        if (pressed)
+    fun release() {
+
+        if (isReleased)
+            return
+
+        pressState = PressState.RELEASED
+        _released.tryEmit(Instant.now())
+    }
+
+    fun press(scope: CoroutineScope) {
+
+        if (isPressed)
             return
 
         pressState = PressState.SHORT_PRESSED
 
         scope.launch {
-            pressState = waitAndCallCallback(shortPressCallback = shortPressCallback, longPressCallback = longPressCallback)
+            pressState = waitAndEmitShortOrLongPressEvent()
         }
     }
 
-    /**
-     * @return the previous press state
-     */
-    fun release(): PressState {
-        if (!pressed)
-            return PressState.RELEASED
-        val previousPressState = pressState
-        pressState = PressState.RELEASED
-        return previousPressState
-    }
-
-    private suspend fun waitAndCallCallback(
-        shortPressCallback: () -> Unit,
-        longPressCallback: () -> Unit,
-    ): PressState {
+    private suspend fun waitAndEmitShortOrLongPressEvent(): PressState {
         delay(longPressThresholdMillis)
-        return if (pressed) {
-            longPressCallback()
+        return if (isPressed) {
+            _longPressed.tryEmit(Instant.now())
             PressState.LONG_PRESSED
         } else {
-            shortPressCallback()
+            _shortPressed.tryEmit(Instant.now())
             PressState.RELEASED
         }
     }

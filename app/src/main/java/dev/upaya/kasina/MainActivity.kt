@@ -10,14 +10,18 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import dev.upaya.kasina.ui.MainScreen
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @Inject
+    lateinit var inputKeyHandler: InputKeyHandler
+
+    private lateinit var flashLightStateControllerResource: FlashLightStateControllerResource
+
     private val volumeKeys = setOf(KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP)
-    private lateinit var inputKeyHandlerResource: InputKeyHandlerResource
-    private lateinit var flashLightControllerResource: FlashLightControllerResource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,30 +33,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun onVolumeDownShortPress() {
-        flashLightControllerResource.toggle()
-    }
-
-    private fun onVolumeDownLongPress() {
-        flashLightControllerResource.turnOn()
-    }
-
-    private fun onVolumeDownRelease(previousPressState: PressState) {
-        if (previousPressState == PressState.LONG_PRESSED)
-            flashLightControllerResource.turnOff()
-    }
-
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
         if (keyCode == KeyEvent.KEYCODE_BACK)
             return super.onKeyDown(keyCode, event)
 
         if (keyCode in volumeKeys) {
-            inputKeyHandlerResource.handleVolumeDownPress(
-                shortPressCallback = ::onVolumeDownShortPress,
-                longPressCallback = ::onVolumeDownLongPress,
-                scope = lifecycleScope,
-            )
+            inputKeyHandler.handleVolumePress(lifecycleScope)
             return true
         }
 
@@ -61,8 +48,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode in volumeKeys) {
-            val previousPressState = inputKeyHandlerResource.handleVolumeDownRelease()
-            onVolumeDownRelease(previousPressState)
+            inputKeyHandler.handleVolumeRelease()
             return true
         }
         return super.onKeyUp(keyCode, event)
@@ -70,8 +56,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        inputKeyHandlerResource = InputKeyHandlerResource(this)
-        flashLightControllerResource = FlashLightControllerResource(this)
+        flashLightStateControllerResource = FlashLightStateControllerResource(this, inputKeyHandler, lifecycleScope)
     }
 
     override fun onPause() {
@@ -85,8 +70,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() {
+        flashLightStateControllerResource.close()
         super.onStop()
-        inputKeyHandlerResource.close()
-        flashLightControllerResource.close()
     }
 }
