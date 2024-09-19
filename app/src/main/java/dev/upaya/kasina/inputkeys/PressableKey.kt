@@ -6,22 +6,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import java.time.Instant
 
 
 class PressableKey(private val longPressThresholdMillis: Long) {
 
-    private val _shortPressed = MutableSharedFlow<Instant>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    private val _longPressed = MutableSharedFlow<Instant>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    private val _released = MutableSharedFlow<Instant>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    val shortPressed: SharedFlow<Instant> = _shortPressed
-    val longPressed: SharedFlow<Instant> = _longPressed
-    val released: SharedFlow<Instant> = _released
+    private val _keyState = MutableSharedFlow<PressableKeyState>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val keyState: SharedFlow<PressableKeyState> = _keyState
 
-    private var pressableKeyState = PressableKeyState.RELEASED
+    private var pressState = PressableKeyState.RELEASED
 
     private val isPressed
-        get() = pressableKeyState != PressableKeyState.RELEASED
+        get() = pressState != PressableKeyState.RELEASED
 
     private val isReleased
         get() = !isPressed
@@ -31,8 +26,8 @@ class PressableKey(private val longPressThresholdMillis: Long) {
         if (isReleased)
             return
 
-        pressableKeyState = PressableKeyState.RELEASED
-        _released.tryEmit(Instant.now())
+        pressState = PressableKeyState.RELEASED
+        _keyState.tryEmit(PressableKeyState.RELEASED)
     }
 
     fun press(scope: CoroutineScope) {
@@ -40,20 +35,21 @@ class PressableKey(private val longPressThresholdMillis: Long) {
         if (isPressed)
             return
 
-        pressableKeyState = PressableKeyState.SHORT_PRESSED
+        pressState = PressableKeyState.SHORT_PRESSED
 
         scope.launch {
-            pressableKeyState = waitAndEmitShortOrLongPressEvent()
+            pressState = waitAndEmitShortOrLongPressEvent()
         }
     }
 
     private suspend fun waitAndEmitShortOrLongPressEvent(): PressableKeyState {
         delay(longPressThresholdMillis)
         return if (isPressed) {
-            _longPressed.tryEmit(Instant.now())
+            _keyState.emit(PressableKeyState.LONG_PRESSED)
             PressableKeyState.LONG_PRESSED
         } else {
-            _shortPressed.tryEmit(Instant.now())
+            _keyState.emit(PressableKeyState.SHORT_PRESSED)
+            _keyState.emit(PressableKeyState.RELEASED)
             PressableKeyState.RELEASED
         }
     }

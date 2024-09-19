@@ -2,6 +2,7 @@ package dev.upaya.kasina.flashlight
 
 import android.content.Context
 import dev.upaya.kasina.inputkeys.InputKeyHandler
+import dev.upaya.kasina.inputkeys.PressableKeyState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -15,22 +16,16 @@ class FlashLightStateControllerResource @Inject constructor(
     private var flashLightState = FlashLightState.OFF
     private var flashLightResource: FlashLightResource? = null
 
-    private var collectReleaseEventsJob: Job? = null
-    private var collectLongPressEventsJob: Job? = null
-    private var collectShortPressEventsJob: Job? = null
+    private var collectVolumeKeyEventsJob: Job? = null
 
     fun start(context: Context, scope: CoroutineScope) {
         flashLightResource = FlashLightResource(context)
-        collectReleaseEventsJob = scope.launch { collectVolumeReleaseEvents() }
-        collectLongPressEventsJob = scope.launch { collectVolumeLonPressEvents() }
-        collectShortPressEventsJob = scope.launch { collectVolumeShortPressEvents() }
+        collectVolumeKeyEventsJob = scope.launch { collectVolumeKeyEvents() }
     }
 
     override fun close() {
         turnOff()
-        collectReleaseEventsJob?.cancel()
-        collectLongPressEventsJob?.cancel()
-        collectShortPressEventsJob?.cancel()
+        collectVolumeKeyEventsJob?.cancel()
         flashLightResource?.close()
     }
 
@@ -49,26 +44,32 @@ class FlashLightStateControllerResource @Inject constructor(
         flashLightState = FlashLightState.ON_SWITCHED
     }
 
-    private suspend fun collectVolumeShortPressEvents() {
-        inputKeyHandler.volumeKeyShortPressed.collect {
-            if (flashLightState == FlashLightState.OFF)
-                switchOn()
-            else if (flashLightState == FlashLightState.ON_SWITCHED)
-                turnOff()
+    private suspend fun collectVolumeKeyEvents() {
+        inputKeyHandler.volumeKeyState.collect { state ->
+            when (state) {
+                PressableKeyState.RELEASED -> { turnOffIfCurrentlyHolding() }
+                PressableKeyState.SHORT_PRESSED -> { switchOnOrOff() }
+                PressableKeyState.LONG_PRESSED -> { turnOnHolding() }
+            }
         }
     }
 
-    private suspend fun collectVolumeLonPressEvents() {
-        inputKeyHandler.volumeKeyLongPressed.collect {
-            if (flashLightState == FlashLightState.OFF || flashLightState == FlashLightState.ON_SWITCHED)
-                holdOn()
-        }
+    private fun turnOffIfCurrentlyHolding() {
+        if (flashLightState == FlashLightState.ON_HOLD)
+            turnOff()
     }
 
-    private suspend fun collectVolumeReleaseEvents() {
-        inputKeyHandler.volumeKeyReleased.collect {
-            if (flashLightState == FlashLightState.ON_HOLD)
-                turnOff()
-        }
+    private fun switchOnOrOff() {
+        if (flashLightState == FlashLightState.OFF)
+            switchOn()
+        else //if (flashLightState == FlashLightState.ON_SWITCHED)
+            turnOff()
+    }
+
+    private fun turnOnHolding() {
+        if (flashLightState == FlashLightState.OFF ||
+            flashLightState == FlashLightState.ON_SWITCHED
+        )
+            holdOn()
     }
 }
