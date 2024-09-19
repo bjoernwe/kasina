@@ -1,4 +1,4 @@
-package dev.upaya.kasina
+package dev.upaya.kasina.inputkeys
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow

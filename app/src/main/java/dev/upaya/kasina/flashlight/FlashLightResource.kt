@@ -1,4 +1,4 @@
-package dev.upaya.kasina
+package dev.upaya.kasina.flashlight
 
 import android.content.Context
 import android.content.Context.CAMERA_SERVICE

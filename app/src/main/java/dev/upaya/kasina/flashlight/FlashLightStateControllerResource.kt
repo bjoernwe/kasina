@@ -1,14 +1,10 @@
-package dev.upaya.kasina
+package dev.upaya.kasina.flashlight
 
 import android.content.Context
+import dev.upaya.kasina.inputkeys.InputKeyHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-
-
-enum class FlashLightState {
-    OFF, ON_SWITCHED, ON_HOLD,
-}
 
 
 class FlashLightStateControllerResource(
