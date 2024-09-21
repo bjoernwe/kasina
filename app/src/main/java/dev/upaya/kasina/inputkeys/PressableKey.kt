@@ -1,22 +1,19 @@
 package dev.upaya.kasina.inputkeys
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 
-class PressableKey(private val longPressThresholdMillis: Long) {
+class PressableKey(private val longPressThresholdMillis: Long = 50L) {
 
-    private val _keyState = MutableSharedFlow<PressableKeyState>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _keyState = MutableStateFlow(PressableKeyState.RELEASED)
     val keyState: SharedFlow<PressableKeyState> = _keyState
 
-    private var pressState = PressableKeyState.RELEASED
-
     private val isPressed
-        get() = pressState != PressableKeyState.RELEASED
+        get() = _keyState.value != PressableKeyState.RELEASED
 
     private val isReleased
         get() = !isPressed
@@ -26,7 +23,6 @@ class PressableKey(private val longPressThresholdMillis: Long) {
         if (isReleased)
             return
 
-        pressState = PressableKeyState.RELEASED
         _keyState.tryEmit(PressableKeyState.RELEASED)
     }
 
@@ -35,22 +31,20 @@ class PressableKey(private val longPressThresholdMillis: Long) {
         if (isPressed)
             return
 
-        pressState = PressableKeyState.SHORT_PRESSED
+        _keyState.tryEmit(PressableKeyState.PRESSED_UNDECIDED)
 
         scope.launch {
-            pressState = waitAndEmitShortOrLongPressEvent()
+            waitAndEmitShortOrLongPressEvent()
         }
     }
 
-    private suspend fun waitAndEmitShortOrLongPressEvent(): PressableKeyState {
+    private suspend fun waitAndEmitShortOrLongPressEvent() {
         delay(longPressThresholdMillis)
-        return if (isPressed) {
-            _keyState.emit(PressableKeyState.LONG_PRESSED)
-            PressableKeyState.LONG_PRESSED
+        if (isPressed) {
+            _keyState.tryEmit(PressableKeyState.PRESSED_LONG)
         } else {
-            _keyState.emit(PressableKeyState.SHORT_PRESSED)
-            _keyState.emit(PressableKeyState.RELEASED)
-            PressableKeyState.RELEASED
+            _keyState.tryEmit(PressableKeyState.PRESSED_SHORT)
+            _keyState.tryEmit(PressableKeyState.RELEASED)
         }
     }
 }

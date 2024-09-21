@@ -8,7 +8,7 @@ import javax.inject.Singleton
 @Singleton
 class InputKeyHandler @Inject constructor() {
 
-    private val volumeDownKey = PressableKey(longPressThresholdMillis = 25L)
+    private val volumeDownKey = PressableKey()
 
     val volumeKeyState = volumeDownKey.keyState
 
