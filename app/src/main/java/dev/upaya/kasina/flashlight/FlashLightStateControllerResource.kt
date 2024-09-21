@@ -1,11 +1,13 @@
 package dev.upaya.kasina.flashlight
 
 import android.content.Context
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dev.upaya.kasina.inputkeys.InputKeyHandler
 import dev.upaya.kasina.inputkeys.PressableKeyState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -17,6 +19,8 @@ class FlashLightStateControllerResource @Inject constructor(
     private var flashLightResource: FlashLightResource? = null
 
     private var collectVolumeKeyEventsJob: Job? = null
+
+    private val firebaseCrashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
     fun start(context: Context, scope: CoroutineScope) {
         flashLightResource = FlashLightResource(context)
@@ -50,7 +54,7 @@ class FlashLightStateControllerResource @Inject constructor(
     }
 
     private suspend fun collectVolumeKeyEvents() {
-        inputKeyHandler.volumeKeyState.collect { state ->
+        inputKeyHandler.volumeDownKeyState.collect { state ->
             when (state) {
                 PressableKeyState.RELEASED -> { handleButtonRelease() }
                 PressableKeyState.PRESSED_UNDECIDED -> { handleUndecidedButtonPress() }
@@ -62,9 +66,9 @@ class FlashLightStateControllerResource @Inject constructor(
 
     private fun handleButtonRelease() {
         when (flashLightState) {
-            FlashLightState.OFF -> { /* nop */ }
-            FlashLightState.ON_UNDECIDED -> { /* nop */ }
-            FlashLightState.ON_SWITCHED -> { /* nop */ }
+            FlashLightState.OFF -> { /* NOP */ }
+            FlashLightState.ON_UNDECIDED -> { /* NOP */ }
+            FlashLightState.ON_SWITCHED -> { /* NOP */ }
             FlashLightState.ON_HOLDING -> { turnOff() }
         }
     }
@@ -72,27 +76,33 @@ class FlashLightStateControllerResource @Inject constructor(
     private fun handleUndecidedButtonPress() {
         when (flashLightState) {
             FlashLightState.OFF -> { turnOnUndecided() }
-            FlashLightState.ON_UNDECIDED -> { /* nop */ }
-            FlashLightState.ON_SWITCHED -> { /* nop */ }
-            FlashLightState.ON_HOLDING -> { /* nop */ }
+            FlashLightState.ON_UNDECIDED -> { logMissingMethod(FlashLightState.ON_UNDECIDED, PressableKeyState.PRESSED_UNDECIDED) }
+            FlashLightState.ON_SWITCHED -> { /* NOP */ }
+            FlashLightState.ON_HOLDING -> { logMissingMethod(FlashLightState.ON_HOLDING, PressableKeyState.PRESSED_UNDECIDED) }
         }
     }
 
     private fun handleShortPress() {
         when (flashLightState) {
-            FlashLightState.OFF -> { /* nop */ }
+            FlashLightState.OFF -> { logMissingMethod(FlashLightState.OFF, PressableKeyState.PRESSED_SHORT) }
             FlashLightState.ON_UNDECIDED -> { turnOnSwitched() }
             FlashLightState.ON_SWITCHED -> { turnOff() }
-            FlashLightState.ON_HOLDING -> { /* nop */ }
+            FlashLightState.ON_HOLDING -> { logMissingMethod(FlashLightState.ON_HOLDING, PressableKeyState.PRESSED_SHORT) }
         }
     }
 
     private fun handleLongPress() {
         when (flashLightState) {
-            FlashLightState.OFF -> { /* nop */ }
+            FlashLightState.OFF -> { logMissingMethod(FlashLightState.OFF, PressableKeyState.PRESSED_LONG) }
             FlashLightState.ON_UNDECIDED -> { turnOnHolding() }
-            FlashLightState.ON_SWITCHED -> { /* nop */ }
-            FlashLightState.ON_HOLDING -> { /* nop */ }
+            FlashLightState.ON_SWITCHED -> { turnOnHolding() /* override SWITCHED with HOLD */ }
+            FlashLightState.ON_HOLDING -> { logMissingMethod(FlashLightState.ON_HOLDING, PressableKeyState.PRESSED_LONG) }
         }
+    }
+
+    private fun logMissingMethod(currentState: FlashLightState, keyEvent: PressableKeyState) {
+        val logString = "Unexpected event $keyEvent in state $currentState"
+        Timber.w(logString)
+        firebaseCrashlytics.recordException(NoSuchMethodException(logString))
     }
 }
