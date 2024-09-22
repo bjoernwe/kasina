@@ -15,8 +15,10 @@ class InputKeyHandler @Inject constructor() {
     private val volumeDownKeyState = volumeDownKey.keyState
     private val volumeUpKeyState = volumeUpKey.keyState
     val volumeKeysState = volumeDownKeyState.combineTransform(volumeUpKeyState) { down, up ->
-        // TODO merge buttons
-        emit(down)
+        if (down == PressableKeyState.RELEASED)
+            emit(up)
+        else
+            emit(down)
     }
 
     fun handleVolumeDownPress(scope: CoroutineScope) {
