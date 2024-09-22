@@ -8,9 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import dev.upaya.kasina.flashlight.FlashLightStateControllerResource
+import dev.upaya.kasina.inputkeys.InputKeyHandler
 import dev.upaya.kasina.ui.MainScreen
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -18,9 +19,10 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var flashLight: FlashLight
+    lateinit var inputKeyHandler: InputKeyHandler
 
-    private val volumeKeys = setOf(KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP)
+    @Inject
+    lateinit var flashLightStateControllerResource: FlashLightStateControllerResource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,18 +39,29 @@ class MainActivity : ComponentActivity() {
         if (keyCode == KeyEvent.KEYCODE_BACK)
             return super.onKeyDown(keyCode, event)
 
-        if (keyCode in volumeKeys) {
-            lifecycleScope.launch {
-                flashLight.turnOnFor(3000L)
-            }
-            return true
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_DOWN -> { inputKeyHandler.handleVolumeDownPress(lifecycleScope); true }
+            KeyEvent.KEYCODE_VOLUME_UP -> { inputKeyHandler.handleVolumeUpPress(lifecycleScope); true }
+            else -> { super.onKeyDown(keyCode, event) }
         }
-
-        return super.onKeyDown(keyCode, event)
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        return super.onKeyUp(keyCode, event)
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_DOWN -> { inputKeyHandler.handleVolumeDownRelease(); true }
+            KeyEvent.KEYCODE_VOLUME_UP -> { inputKeyHandler.handleVolumeUpRelease(); true }
+            else -> { super.onKeyUp(keyCode, event) }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        flashLightStateControllerResource.start(this, lifecycleScope)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onResume() {
@@ -56,8 +69,8 @@ class MainActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
-    override fun onPause() {
-        super.onPause()
-        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    override fun onStop() {
+        flashLightStateControllerResource.close()
+        super.onStop()
     }
 }
