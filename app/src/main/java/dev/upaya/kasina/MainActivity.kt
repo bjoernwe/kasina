@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            FlashKasinaTheme(darkTheme = true) {
+            FlashKasinaTheme(darkTheme = true, dynamicColor = false) {
                 MainScreen()
             }
         }
