@@ -7,7 +7,11 @@ import android.hardware.camera2.CameraManager
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
-import com.google.firebase.analytics.logEvent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class FlashLightResource(context: Context) : AutoCloseable {
@@ -40,21 +44,29 @@ class FlashLightResource(context: Context) : AutoCloseable {
         cameraManager.unregisterTorchCallback(torchCallback)
     }
 
-    fun turnOn() {
+    @OptIn(DelicateCoroutinesApi::class)
+    fun turnOn(dispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
         if (_isOn)
             return
 
-        cameraManager.setTorchMode(cameraId, true)
-        firebaseAnalytics.logEvent("flashlight_on") { }
+        GlobalScope.launch(dispatcher) {
+            cameraManager.setTorchMode(cameraId, true)
+        }
+
+        firebaseAnalytics.logEvent("flashlight_on", null)
     }
 
-    fun turnOff() {
+    @OptIn(DelicateCoroutinesApi::class)
+    fun turnOff(dispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
         if (isOff)
             return
 
-        cameraManager.setTorchMode(cameraId, false)
-        firebaseAnalytics.logEvent("flashlight_off") { }
+        GlobalScope.launch(dispatcher) {
+            cameraManager.setTorchMode(cameraId, false)
+        }
+
+        firebaseAnalytics.logEvent("flashlight_off", null)
     }
 }
