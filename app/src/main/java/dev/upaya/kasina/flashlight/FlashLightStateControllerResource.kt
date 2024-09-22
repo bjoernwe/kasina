@@ -9,8 +9,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
 
+@Singleton
 class FlashLightStateControllerResource @Inject constructor(
     private val inputKeyHandler: InputKeyHandler,
 ) : AutoCloseable {
