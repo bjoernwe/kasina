@@ -59,4 +59,11 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
+
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations) {
+            flashLightViewModel.turnFlashOff()
+        }
+    }
 }

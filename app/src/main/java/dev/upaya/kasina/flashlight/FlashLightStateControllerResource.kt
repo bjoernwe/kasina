@@ -35,7 +35,7 @@ class FlashLightStateControllerResource @Inject constructor(
         flashLightResource?.close()
     }
 
-    private fun turnOff() {
+    fun turnOff() {
         flashLightResource?.turnOff()
         flashLightState = FlashLightState.OFF
     }

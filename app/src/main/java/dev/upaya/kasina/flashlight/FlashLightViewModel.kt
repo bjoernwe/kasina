@@ -13,7 +13,7 @@ import javax.inject.Singleton
 class FlashLightViewModel @Inject constructor(
     app: Application,
     private val inputKeyHandler: InputKeyHandler,
-    flashLightStateControllerResource: FlashLightStateControllerResource,
+    private val flashLightStateControllerResource: FlashLightStateControllerResource,
 ) : AndroidViewModel(app) {
 
     init {
@@ -35,5 +35,9 @@ class FlashLightViewModel @Inject constructor(
 
     fun handleVolumeUpRelease() {
         inputKeyHandler.handleVolumeUpRelease()
+    }
+
+    fun turnFlashOff() {
+        flashLightStateControllerResource.turnOff()
     }
 }
