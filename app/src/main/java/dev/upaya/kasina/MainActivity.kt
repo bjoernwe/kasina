@@ -24,8 +24,6 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var flashLightStateControllerResource: FlashLightStateControllerResource
 
-    private val volumeKeys = setOf(KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -41,20 +39,19 @@ class MainActivity : ComponentActivity() {
         if (keyCode == KeyEvent.KEYCODE_BACK)
             return super.onKeyDown(keyCode, event)
 
-        if (keyCode in volumeKeys) {
-            inputKeyHandler.handleVolumePress(lifecycleScope)
-            return true
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_DOWN -> { inputKeyHandler.handleVolumeDownPress(lifecycleScope); true }
+            KeyEvent.KEYCODE_VOLUME_UP -> { inputKeyHandler.handleVolumeUpPress(lifecycleScope); true }
+            else -> { super.onKeyDown(keyCode, event) }
         }
-
-        return super.onKeyDown(keyCode, event)
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode in volumeKeys) {
-            inputKeyHandler.handleVolumeRelease()
-            return true
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_DOWN -> { inputKeyHandler.handleVolumeDownRelease(); true }
+            KeyEvent.KEYCODE_VOLUME_UP -> { inputKeyHandler.handleVolumeUpRelease(); true }
+            else -> { super.onKeyUp(keyCode, event) }
         }
-        return super.onKeyUp(keyCode, event)
     }
 
     override fun onStart() {

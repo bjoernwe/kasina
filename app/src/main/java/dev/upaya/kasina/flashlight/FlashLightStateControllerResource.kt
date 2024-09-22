@@ -54,7 +54,7 @@ class FlashLightStateControllerResource @Inject constructor(
     }
 
     private suspend fun collectVolumeKeyEvents() {
-        inputKeyHandler.volumeDownKeyState.collect { state ->
+        inputKeyHandler.volumeKeysState.collect { state ->
             when (state) {
                 PressableKeyState.RELEASED -> { handleButtonRelease() }
                 PressableKeyState.PRESSED_UNDECIDED -> { handleUndecidedButtonPress() }
