@@ -7,20 +7,30 @@ import android.hardware.camera2.CameraManager
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class FlashLightResource(context: Context) : AutoCloseable {
+@Singleton
+class FlashLight @Inject constructor(
+    @ApplicationContext context: Context,
+) {
 
-    private var _isOn = false
-    val isOn: Boolean
-        get() = _isOn
-    private val isOff: Boolean
-        get() = !isOn
+    private val _isOn = MutableStateFlow(false)
+    val isOn: StateFlow<Boolean> = _isOn
+
+    private val turnedOn: Boolean
+        get() = _isOn.value
+    private val turnedOff: Boolean
+        get() = !turnedOn
 
     private val cameraManager = context.getSystemService(CAMERA_SERVICE) as CameraManager
     private val cameraId = cameraManager.cameraIdList.first { id ->
@@ -28,7 +38,7 @@ class FlashLightResource(context: Context) : AutoCloseable {
     }
     private val torchCallback = object : CameraManager.TorchCallback() {
         override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
-            _isOn = enabled
+            _isOn.value = enabled
         }
     }
 
@@ -38,16 +48,10 @@ class FlashLightResource(context: Context) : AutoCloseable {
         cameraManager.registerTorchCallback(torchCallback, null)
     }
 
-    @Override
-    override fun close() {
-        turnOff()
-        cameraManager.unregisterTorchCallback(torchCallback)
-    }
-
     @OptIn(DelicateCoroutinesApi::class)
     fun turnOn(dispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
-        if (_isOn)
+        if (turnedOn)
             return
 
         GlobalScope.launch(dispatcher) {
@@ -60,7 +64,7 @@ class FlashLightResource(context: Context) : AutoCloseable {
     @OptIn(DelicateCoroutinesApi::class)
     fun turnOff(dispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
-        if (isOff)
+        if (turnedOff)
             return
 
         GlobalScope.launch(dispatcher) {

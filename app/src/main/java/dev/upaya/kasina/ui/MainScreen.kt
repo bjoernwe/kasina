@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +21,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import dev.upaya.kasina.R
+import dev.upaya.kasina.flashlight.FlashLightViewModel
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 
 
@@ -31,6 +34,9 @@ fun MainScreen() {
     val isLandscape = remember {
         configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     }
+
+    val flashLightViewModel: FlashLightViewModel = hiltViewModel()
+    val isFlashLightOn = flashLightViewModel.isFlashLightOn.collectAsState(false)
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Box(modifier = Modifier
@@ -46,7 +52,7 @@ fun MainScreen() {
                     .fillMaxSize(.25f)
                     .aspectRatio(1f, !isLandscape),
                 contentDescription = "Lightbulb",
-                tint = MaterialTheme.colorScheme.primaryContainer,
+                tint = if (isFlashLightOn.value) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer,
             )
             Row(
                 modifier = Modifier

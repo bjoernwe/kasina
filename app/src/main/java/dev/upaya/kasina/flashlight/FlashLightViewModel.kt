@@ -1,24 +1,23 @@
 package dev.upaya.kasina.flashlight
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.upaya.kasina.inputkeys.InputKeyHandler
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
-import javax.inject.Singleton
 
 
-@Singleton
+@HiltViewModel
 class FlashLightViewModel @Inject constructor(
-    app: Application,
     private val inputKeyHandler: InputKeyHandler,
-    private val flashLightStateControllerResource: FlashLightStateControllerResource,
-) : AndroidViewModel(app) {
+    private val flashLightStateController: FlashLightStateController,
+) : ViewModel() {
+
+    val isFlashLightOn = flashLightStateController.flashLight.isOn
 
     init {
-        addCloseable(flashLightStateControllerResource)
-        flashLightStateControllerResource.start(context = app, scope = viewModelScope)
+        flashLightStateController.start(scope = viewModelScope)
     }
 
     fun handleVolumeDownPress(scope: CoroutineScope) {
@@ -38,6 +37,6 @@ class FlashLightViewModel @Inject constructor(
     }
 
     fun turnFlashOff() {
-        flashLightStateControllerResource.turnOff()
+        flashLightStateController.turnOff()
     }
 }

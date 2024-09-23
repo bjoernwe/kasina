@@ -1,7 +1,5 @@
 package dev.upaya.kasina.flashlight
 
-import android.content.Context
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dev.upaya.kasina.inputkeys.InputKeyHandler
 import dev.upaya.kasina.inputkeys.PressableKeyState
 import kotlinx.coroutines.CoroutineScope
@@ -12,43 +10,35 @@ import javax.inject.Singleton
 
 
 @Singleton
-class FlashLightStateControllerResource @Inject constructor(
+class FlashLightStateController @Inject constructor(
+    val flashLight: FlashLight,
     private val inputKeyHandler: InputKeyHandler,
-) : AutoCloseable {
+) {
 
     private var flashLightState = FlashLightState.OFF
-    private var flashLightResource: FlashLightResource? = null
-
     private var collectVolumeKeyEventsJob: Job? = null
 
-    fun start(context: Context, scope: CoroutineScope) {
-        flashLightResource = FlashLightResource(context)
+    fun start(scope: CoroutineScope) {
         collectVolumeKeyEventsJob = scope.launch { collectVolumeKeyEvents() }
     }
 
-    override fun close() {
-        turnOff()
-        collectVolumeKeyEventsJob?.cancel()
-        flashLightResource?.close()
-    }
-
     fun turnOff() {
-        flashLightResource?.turnOff()
+        flashLight.turnOff()
         flashLightState = FlashLightState.OFF
     }
 
     private fun turnOnUndecided() {
-        flashLightResource?.turnOn()
+        flashLight.turnOn()
         flashLightState = FlashLightState.ON_UNDECIDED
     }
 
     private fun turnOnHolding() {
-        flashLightResource?.turnOn()
+        flashLight.turnOn()
         flashLightState = FlashLightState.ON_HOLDING
     }
 
     private fun turnOnSwitched() {
-        flashLightResource?.turnOn()
+        flashLight.turnOn()
         flashLightState = FlashLightState.ON_SWITCHED
     }
 

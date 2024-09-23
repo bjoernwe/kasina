@@ -6,22 +6,24 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import dev.upaya.kasina.flashlight.FlashLightViewModel
 import dev.upaya.kasina.ui.MainScreen
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var flashLightViewModel: FlashLightViewModel
+    private lateinit var flashLightViewModel: FlashLightViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+        flashLightViewModel = ViewModelProvider(this)[FlashLightViewModel::class.java]
+
         enableEdgeToEdge()
         setContent {
             FlashKasinaTheme(darkTheme = true, dynamicColor = false) {
