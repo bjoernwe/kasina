@@ -14,7 +14,7 @@ class FlashLightViewModel @Inject constructor(
     private val flashLightStateController: FlashLightStateController,
 ) : ViewModel() {
 
-    val isFlashLightOn = flashLightStateController.flashLight.isOn
+    val isFlashLightOn = flashLightStateController.isFlashLightOn
 
     init {
         flashLightStateController.start(scope = viewModelScope)

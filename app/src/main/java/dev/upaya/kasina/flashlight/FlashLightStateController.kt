@@ -11,9 +11,11 @@ import javax.inject.Singleton
 
 @Singleton
 class FlashLightStateController @Inject constructor(
-    val flashLight: FlashLight,
+    private val flashLight: FlashLight,
     private val inputKeyHandler: InputKeyHandler,
 ) {
+
+    val isFlashLightOn = flashLight.isOn
 
     private var flashLightState = FlashLightState.OFF
     private var collectVolumeKeyEventsJob: Job? = null
