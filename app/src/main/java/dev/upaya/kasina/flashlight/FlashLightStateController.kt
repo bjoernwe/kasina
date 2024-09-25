@@ -18,6 +18,7 @@ class FlashLightStateController @Inject constructor(
     val isFlashLightOn = flashLight.isOn
 
     private var flashLightState = FlashLightState.OFF
+
     private var collectVolumeKeyEventsJob: Job? = null
 
     fun start(scope: CoroutineScope) {
@@ -29,18 +30,20 @@ class FlashLightStateController @Inject constructor(
         flashLightState = FlashLightState.OFF
     }
 
-    private fun turnOnUndecided() {
+    private fun transitionToOn() {
         flashLight.turnOn()
-        flashLightState = FlashLightState.ON_UNDECIDED
+        flashLightState = FlashLightState.TRANSITION_TO_ON
+    }
+
+    private fun transitionToOff() {
+        flashLightState = FlashLightState.TRANSITION_TO_OFF
     }
 
     private fun turnOnHolding() {
-        flashLight.turnOn()
         flashLightState = FlashLightState.ON_HOLDING
     }
 
     private fun turnOnSwitched() {
-        flashLight.turnOn()
         flashLightState = FlashLightState.ON_SWITCHED
     }
 
@@ -48,9 +51,8 @@ class FlashLightStateController @Inject constructor(
         inputKeyHandler.volumeKeysState.collect { state ->
             when (state) {
                 PressableKeyState.RELEASED -> { handleButtonRelease() }
-                PressableKeyState.PRESSED_UNDECIDED -> { handleUndecidedButtonPress() }
-                PressableKeyState.PRESSED_SHORT -> { handleShortPress() }
-                PressableKeyState.PRESSED_LONG -> { handleLongPress() }
+                PressableKeyState.PRESSED -> { handleButtonPress() }
+                PressableKeyState.PRESSED_LONG -> { handleButtonLongPress() }
             }
         }
     }
@@ -58,35 +60,29 @@ class FlashLightStateController @Inject constructor(
     private fun handleButtonRelease() {
         when (flashLightState) {
             FlashLightState.OFF -> { /* NOP */ }
-            FlashLightState.ON_UNDECIDED -> { /* NOP */ }
+            FlashLightState.TRANSITION_TO_ON -> { turnOnSwitched() }
+            FlashLightState.TRANSITION_TO_OFF -> { turnOff() }
             FlashLightState.ON_SWITCHED -> { /* NOP */ }
             FlashLightState.ON_HOLDING -> { turnOff() }
         }
     }
 
-    private fun handleUndecidedButtonPress() {
+    private fun handleButtonPress() {
         when (flashLightState) {
-            FlashLightState.OFF -> { turnOnUndecided() }
-            FlashLightState.ON_UNDECIDED -> { /* NOP */ }
+            FlashLightState.OFF -> { transitionToOn() }
+            FlashLightState.TRANSITION_TO_ON -> { /* NOP */ }
+            FlashLightState.TRANSITION_TO_OFF -> { /* NOP */ }
+            FlashLightState.ON_SWITCHED -> { transitionToOff() }
+            FlashLightState.ON_HOLDING -> { /* NOP */ }
+        }
+    }
+
+    private fun handleButtonLongPress() {
+        when (flashLightState) {
+            FlashLightState.OFF -> { /* NOP */ }
+            FlashLightState.TRANSITION_TO_ON -> { turnOnHolding() }
+            FlashLightState.TRANSITION_TO_OFF -> { turnOnHolding() }
             FlashLightState.ON_SWITCHED -> { /* NOP */ }
-            FlashLightState.ON_HOLDING -> { /* NOP */ }
-        }
-    }
-
-    private fun handleShortPress() {
-        when (flashLightState) {
-            FlashLightState.OFF -> { turnOnSwitched() }
-            FlashLightState.ON_UNDECIDED -> { turnOnSwitched() }
-            FlashLightState.ON_SWITCHED -> { turnOff() }
-            FlashLightState.ON_HOLDING -> { /* NOP */ }
-        }
-    }
-
-    private fun handleLongPress() {
-        when (flashLightState) {
-            FlashLightState.OFF -> { turnOnHolding() }
-            FlashLightState.ON_UNDECIDED -> { turnOnHolding() }
-            FlashLightState.ON_SWITCHED -> { turnOnHolding() /* override SWITCHED with HOLD */ }
             FlashLightState.ON_HOLDING -> { /* NOP */ }
         }
     }
