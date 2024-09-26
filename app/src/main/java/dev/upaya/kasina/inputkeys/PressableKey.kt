@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 
-class PressableKey(private val longPressThresholdMillis: Long = 50L) {
+class PressableKey(private val longPressThresholdMillis: Long = 200L) {
 
     private val _keyState = MutableStateFlow(PressableKeyState.RELEASED)
     val keyState: SharedFlow<PressableKeyState> = _keyState
@@ -31,7 +31,7 @@ class PressableKey(private val longPressThresholdMillis: Long = 50L) {
         if (isPressed)
             return
 
-        _keyState.tryEmit(PressableKeyState.PRESSED_UNDECIDED)
+        _keyState.tryEmit(PressableKeyState.PRESSED)
 
         scope.launch {
             waitAndEmitShortOrLongPressEvent()
@@ -41,10 +41,9 @@ class PressableKey(private val longPressThresholdMillis: Long = 50L) {
     private suspend fun waitAndEmitShortOrLongPressEvent() {
         delay(longPressThresholdMillis)
         if (isPressed) {
-            _keyState.tryEmit(PressableKeyState.PRESSED_LONG)
+            _keyState.value = PressableKeyState.PRESSED_LONG
         } else {
-            _keyState.tryEmit(PressableKeyState.PRESSED_SHORT)
-            _keyState.tryEmit(PressableKeyState.RELEASED)
+            _keyState.value = PressableKeyState.RELEASED
         }
     }
 }

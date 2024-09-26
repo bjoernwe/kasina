@@ -6,29 +6,27 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import dev.upaya.kasina.flashlight.FlashLightStateControllerResource
-import dev.upaya.kasina.inputkeys.InputKeyHandler
+import dev.upaya.kasina.flashlight.FlashlightViewModel
 import dev.upaya.kasina.ui.MainScreen
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var inputKeyHandler: InputKeyHandler
-
-    @Inject
-    lateinit var flashLightStateControllerResource: FlashLightStateControllerResource
+    private lateinit var flashlightViewModel: FlashlightViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+        flashlightViewModel = ViewModelProvider(this)[FlashlightViewModel::class.java]
+
         enableEdgeToEdge()
         setContent {
-            FlashKasinaTheme(darkTheme = true) {
+            FlashKasinaTheme(darkTheme = true, dynamicColor = false) {
                 MainScreen()
             }
         }
@@ -40,23 +38,18 @@ class MainActivity : ComponentActivity() {
             return super.onKeyDown(keyCode, event)
 
         return when (keyCode) {
-            KeyEvent.KEYCODE_VOLUME_DOWN -> { inputKeyHandler.handleVolumeDownPress(lifecycleScope); true }
-            KeyEvent.KEYCODE_VOLUME_UP -> { inputKeyHandler.handleVolumeUpPress(lifecycleScope); true }
+            KeyEvent.KEYCODE_VOLUME_DOWN -> { flashlightViewModel.handleVolumeDownPress(lifecycleScope); true }
+            KeyEvent.KEYCODE_VOLUME_UP -> { flashlightViewModel.handleVolumeUpPress(lifecycleScope); true }
             else -> { super.onKeyDown(keyCode, event) }
         }
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         return when (keyCode) {
-            KeyEvent.KEYCODE_VOLUME_DOWN -> { inputKeyHandler.handleVolumeDownRelease(); true }
-            KeyEvent.KEYCODE_VOLUME_UP -> { inputKeyHandler.handleVolumeUpRelease(); true }
+            KeyEvent.KEYCODE_VOLUME_DOWN -> { flashlightViewModel.handleVolumeDownRelease(); true }
+            KeyEvent.KEYCODE_VOLUME_UP -> { flashlightViewModel.handleVolumeUpRelease(); true }
             else -> { super.onKeyUp(keyCode, event) }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        flashLightStateControllerResource.start(this, lifecycleScope)
     }
 
     override fun onPause() {
@@ -70,7 +63,9 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() {
-        flashLightStateControllerResource.close()
         super.onStop()
+        if (!isChangingConfigurations) {
+            flashlightViewModel.turnFlashOff()
+        }
     }
 }
