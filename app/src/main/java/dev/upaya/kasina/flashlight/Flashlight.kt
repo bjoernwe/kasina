@@ -20,7 +20,7 @@ import javax.inject.Singleton
 
 
 @Singleton
-class FlashLight @Inject constructor(
+class Flashlight @Inject constructor(
     @ApplicationContext context: Context,
 ) {
 

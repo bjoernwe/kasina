@@ -9,15 +9,15 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class FlashLightViewModel @Inject constructor(
+class FlashlightViewModel @Inject constructor(
     private val inputKeyHandler: InputKeyHandler,
-    private val flashLightStateController: FlashLightStateController,
+    private val flashlightStateController: FlashlightStateController,
 ) : ViewModel() {
 
-    val isFlashLightOn = flashLightStateController.isFlashLightOn
+    val isFlashlightOn = flashlightStateController.isFlashlightOn
 
     init {
-        flashLightStateController.start(scope = viewModelScope)
+        flashlightStateController.start(scope = viewModelScope)
     }
 
     fun handleVolumeDownPress(scope: CoroutineScope) {
@@ -37,6 +37,6 @@ class FlashLightViewModel @Inject constructor(
     }
 
     fun turnFlashOff() {
-        flashLightStateController.turnOff()
+        flashlightStateController.turnOff()
     }
 }
