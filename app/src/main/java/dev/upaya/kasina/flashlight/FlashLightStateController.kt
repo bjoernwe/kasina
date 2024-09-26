@@ -4,6 +4,8 @@ import dev.upaya.kasina.inputkeys.InputKeyHandler
 import dev.upaya.kasina.inputkeys.PressableKeyState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,73 +19,82 @@ class FlashLightStateController @Inject constructor(
 
     val isFlashLightOn = flashLight.isOn
 
-    private var flashLightState = FlashLightState.OFF
+    private var _flashLightState = MutableStateFlow(FlashLightState.OFF)
 
-    private var collectVolumeKeyEventsJob: Job? = null
+    private var flashLightStateJob: Job? = null
+    private var flashLightOnOffJob: Job? = null
 
     fun start(scope: CoroutineScope) {
-        collectVolumeKeyEventsJob = scope.launch { collectVolumeKeyEvents() }
+        flashLightStateJob = launchFlashLightStateJob(scope)
+        flashLightOnOffJob = launchFlashLightOnOffJob(scope)
     }
 
     fun turnOff() {
-        flashLight.turnOff()
-        flashLightState = FlashLightState.OFF
+        _flashLightState.update { FlashLightState.OFF }
     }
 
-    private fun transitionToOn() {
-        flashLight.turnOn()
-        flashLightState = FlashLightState.TRANSITION_TO_ON
+    private fun launchFlashLightStateJob(scope: CoroutineScope) = scope.launch {
+        inputKeyHandler.volumeKeysState.collect { keyEvent ->
+            updateFlashLightState(keyEvent)
+        }
     }
 
-    private fun transitionToOff() {
-        flashLightState = FlashLightState.TRANSITION_TO_OFF
-    }
-
-    private fun turnOnHolding() {
-        flashLightState = FlashLightState.ON_HOLDING
-    }
-
-    private fun turnOnSwitched() {
-        flashLightState = FlashLightState.ON_SWITCHED
-    }
-
-    private suspend fun collectVolumeKeyEvents() {
-        inputKeyHandler.volumeKeysState.collect { state ->
+    private fun launchFlashLightOnOffJob(scope: CoroutineScope) = scope.launch {
+        _flashLightState.collect { state ->
             when (state) {
-                PressableKeyState.RELEASED -> { handleButtonRelease() }
-                PressableKeyState.PRESSED -> { handleButtonPress() }
-                PressableKeyState.PRESSED_LONG -> { handleButtonLongPress() }
+                FlashLightState.OFF -> flashLight.turnOff()
+                else -> flashLight.turnOn()
             }
         }
     }
 
-    private fun handleButtonRelease() {
-        when (flashLightState) {
-            FlashLightState.OFF -> { /* NOP */ }
-            FlashLightState.TRANSITION_TO_ON -> { turnOnSwitched() }
-            FlashLightState.TRANSITION_TO_OFF -> { turnOff() }
-            FlashLightState.ON_SWITCHED -> { /* NOP */ }
-            FlashLightState.ON_HOLDING -> { turnOff() }
+    private fun updateFlashLightState(keyEvent: PressableKeyState) {
+        _flashLightState.update { currentState ->
+            when (currentState) {
+                FlashLightState.OFF -> handleKeyForOffState(keyEvent) ?: currentState
+                FlashLightState.TRANSITION_TO_ON -> handleKeyForTransitionToOnState(keyEvent) ?: currentState
+                FlashLightState.TRANSITION_TO_OFF -> handleKeyForTransitionToOffState(keyEvent) ?: currentState
+                FlashLightState.ON_SWITCHED -> handleKeyForSwitchedOnState(keyEvent) ?: currentState
+                FlashLightState.ON_HOLDING -> handleKeyForHoldingOnState(keyEvent) ?: currentState
+            }
         }
     }
+}
 
-    private fun handleButtonPress() {
-        when (flashLightState) {
-            FlashLightState.OFF -> { transitionToOn() }
-            FlashLightState.TRANSITION_TO_ON -> { /* NOP */ }
-            FlashLightState.TRANSITION_TO_OFF -> { /* NOP */ }
-            FlashLightState.ON_SWITCHED -> { transitionToOff() }
-            FlashLightState.ON_HOLDING -> { /* NOP */ }
-        }
+
+private fun handleKeyForOffState(keyEvent: PressableKeyState): FlashLightState? {
+    return when (keyEvent) {
+        PressableKeyState.PRESSED -> FlashLightState.TRANSITION_TO_ON
+        else -> null
     }
+}
 
-    private fun handleButtonLongPress() {
-        when (flashLightState) {
-            FlashLightState.OFF -> { /* NOP */ }
-            FlashLightState.TRANSITION_TO_ON -> { turnOnHolding() }
-            FlashLightState.TRANSITION_TO_OFF -> { turnOnHolding() }
-            FlashLightState.ON_SWITCHED -> { /* NOP */ }
-            FlashLightState.ON_HOLDING -> { /* NOP */ }
-        }
+private fun handleKeyForTransitionToOnState(keyEvent: PressableKeyState): FlashLightState? {
+    return when (keyEvent) {
+        PressableKeyState.RELEASED -> FlashLightState.ON_SWITCHED
+        PressableKeyState.PRESSED_LONG -> FlashLightState.ON_HOLDING
+        else -> null
+    }
+}
+
+private fun handleKeyForTransitionToOffState(keyEvent: PressableKeyState): FlashLightState? {
+    return when (keyEvent) {
+        PressableKeyState.RELEASED -> FlashLightState.OFF
+        PressableKeyState.PRESSED_LONG -> FlashLightState.ON_HOLDING
+        else -> null
+    }
+}
+
+private fun handleKeyForSwitchedOnState(keyEvent: PressableKeyState): FlashLightState? {
+    return when (keyEvent) {
+        PressableKeyState.PRESSED -> FlashLightState.TRANSITION_TO_OFF
+        else -> null
+    }
+}
+
+private fun handleKeyForHoldingOnState(keyEvent: PressableKeyState): FlashLightState? {
+    return when (keyEvent) {
+        PressableKeyState.RELEASED -> FlashLightState.OFF
+        else -> null
     }
 }
