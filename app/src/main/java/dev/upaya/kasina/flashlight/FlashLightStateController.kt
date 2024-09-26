@@ -35,7 +35,9 @@ class FlashLightStateController @Inject constructor(
 
     private fun launchFlashLightStateJob(scope: CoroutineScope) = scope.launch {
         inputKeyHandler.volumeKeysState.collect { keyEvent ->
-            updateFlashLightState(keyEvent)
+            _flashLightState.update { currentState ->
+                transitionToNextState(currentState, keyEvent)
+            }
         }
     }
 
@@ -47,54 +49,18 @@ class FlashLightStateController @Inject constructor(
             }
         }
     }
-
-    private fun updateFlashLightState(keyEvent: PressableKeyState) {
-        _flashLightState.update { currentState ->
-            when (currentState) {
-                FlashLightState.OFF -> handleKeyForOffState(keyEvent) ?: currentState
-                FlashLightState.TRANSITION_TO_ON -> handleKeyForTransitionToOnState(keyEvent) ?: currentState
-                FlashLightState.TRANSITION_TO_OFF -> handleKeyForTransitionToOffState(keyEvent) ?: currentState
-                FlashLightState.ON_SWITCHED -> handleKeyForSwitchedOnState(keyEvent) ?: currentState
-                FlashLightState.ON_HOLDING -> handleKeyForHoldingOnState(keyEvent) ?: currentState
-            }
-        }
-    }
 }
 
 
-private fun handleKeyForOffState(keyEvent: PressableKeyState): FlashLightState? {
-    return when (keyEvent) {
-        PressableKeyState.PRESSED -> FlashLightState.TRANSITION_TO_ON
-        else -> null
-    }
-}
-
-private fun handleKeyForTransitionToOnState(keyEvent: PressableKeyState): FlashLightState? {
-    return when (keyEvent) {
-        PressableKeyState.RELEASED -> FlashLightState.ON_SWITCHED
-        PressableKeyState.PRESSED_LONG -> FlashLightState.ON_HOLDING
-        else -> null
-    }
-}
-
-private fun handleKeyForTransitionToOffState(keyEvent: PressableKeyState): FlashLightState? {
-    return when (keyEvent) {
-        PressableKeyState.RELEASED -> FlashLightState.OFF
-        PressableKeyState.PRESSED_LONG -> FlashLightState.ON_HOLDING
-        else -> null
-    }
-}
-
-private fun handleKeyForSwitchedOnState(keyEvent: PressableKeyState): FlashLightState? {
-    return when (keyEvent) {
-        PressableKeyState.PRESSED -> FlashLightState.TRANSITION_TO_OFF
-        else -> null
-    }
-}
-
-private fun handleKeyForHoldingOnState(keyEvent: PressableKeyState): FlashLightState? {
-    return when (keyEvent) {
-        PressableKeyState.RELEASED -> FlashLightState.OFF
-        else -> null
+private fun transitionToNextState(currentState: FlashLightState, keyEvent: PressableKeyState): FlashLightState {
+    return when (currentState to keyEvent) {
+        FlashLightState.OFF               to PressableKeyState.PRESSED      -> FlashLightState.TRANSITION_TO_ON
+        FlashLightState.TRANSITION_TO_ON  to PressableKeyState.PRESSED_LONG -> FlashLightState.ON_HOLDING
+        FlashLightState.TRANSITION_TO_ON  to PressableKeyState.RELEASED     -> FlashLightState.ON_SWITCHED
+        FlashLightState.ON_SWITCHED       to PressableKeyState.PRESSED      -> FlashLightState.TRANSITION_TO_OFF
+        FlashLightState.TRANSITION_TO_OFF to PressableKeyState.PRESSED_LONG -> FlashLightState.ON_HOLDING
+        FlashLightState.TRANSITION_TO_OFF to PressableKeyState.RELEASED     -> FlashLightState.OFF
+        FlashLightState.ON_HOLDING        to PressableKeyState.RELEASED     -> FlashLightState.OFF
+        else -> currentState
     }
 }
