@@ -72,9 +72,9 @@ private fun calcFlashlightState(currentState: FlashlightState, keyEvent: Pressab
 
     // Did the user turn the flashlight on/off manually?
     if (!isStateCongruentWithFlashlight(currentState, isFlashlightOn))
-        return fixedFlashlightState(isFlashlightOn)
+        return getFixedFlashlightState(isFlashlightOn)
 
-    return transitionToNextFlashlightState(currentState, keyEvent)
+    return calcNextFlashlightState(currentState, keyEvent)
 }
 
 
@@ -91,12 +91,12 @@ private fun isStateCongruentWithFlashlight(currentState: FlashlightState, isFlas
 }
 
 
-private fun fixedFlashlightState(isFlashlightOn: Boolean): FlashlightState {
+private fun getFixedFlashlightState(isFlashlightOn: Boolean): FlashlightState {
     return if (isFlashlightOn) FlashlightState.ON_SWITCHED else FlashlightState.OFF
 }
 
 
-private fun transitionToNextFlashlightState(currentState: FlashlightState, keyEvent: PressableKeyState): FlashlightState {
+private fun calcNextFlashlightState(currentState: FlashlightState, keyEvent: PressableKeyState): FlashlightState {
     return when (currentState to keyEvent) {
         FlashlightState.OFF               to PressableKeyState.PRESSED      -> FlashlightState.TRANSITION_TO_ON
         FlashlightState.TRANSITION_TO_ON  to PressableKeyState.PRESSED_LONG -> FlashlightState.ON_HOLDING
