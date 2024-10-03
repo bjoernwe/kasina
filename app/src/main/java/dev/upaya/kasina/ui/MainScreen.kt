@@ -39,7 +39,7 @@ fun MainScreen() {
 
     val flashlightViewModel: FlashlightViewModel = hiltViewModel()
     val isFlashlightOn = flashlightViewModel.isFlashlightOn.collectAsState(false)
-    val flashlightEvents = flashlightViewModel.flashlightEvents.collectAsState(initial = emptyList())
+    val recentSessions = flashlightViewModel.recentSessions.collectAsState(initial = emptyList())
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Box(modifier = Modifier
@@ -52,8 +52,8 @@ fun MainScreen() {
                 modifier = Modifier
                     .align(Alignment.TopStart)
             ) {
-                items(flashlightEvents.value) { event ->
-                    Text(event.timestamp.toString())
+                items(recentSessions.value) { session ->
+                    Text(session.toString())
                 }
             }
             Icon(
