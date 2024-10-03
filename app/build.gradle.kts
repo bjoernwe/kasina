@@ -1,7 +1,8 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
-    id("kotlin-kapt")
+    alias(libs.plugins.compose.compiler)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("com.google.firebase.crashlytics")
     id("com.google.gms.google-services")
@@ -22,10 +23,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas")
-            }
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
 
@@ -73,8 +72,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.hilt.android)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
@@ -84,9 +83,8 @@ dependencies {
 
     annotationProcessor(libs.androidx.room.compiler)
 
-    kapt(libs.hilt.android.compiler)
-    //kapt(libs.room.compiler)
-    kapt("androidx.room:room-compiler:2.6.1")
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.junit)
@@ -98,9 +96,4 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-}
-
-kapt {
-    // Allow references to generated code
-    correctErrorTypes = true
 }
