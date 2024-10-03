@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.upaya.kasina.inputkeys.InputKeyHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -17,7 +18,9 @@ class FlashlightViewModel @Inject constructor(
     val isFlashlightOn = flashlightStateController.isFlashlightOn
 
     init {
-        flashlightStateController.start(scope = viewModelScope)
+        viewModelScope.launch {
+            flashlightStateController.startControllingFlashlightState()
+        }
     }
 
     fun handleVolumeDownPress(scope: CoroutineScope) {

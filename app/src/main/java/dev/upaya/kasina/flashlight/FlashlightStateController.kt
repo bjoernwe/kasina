@@ -2,11 +2,12 @@ package dev.upaya.kasina.flashlight
 
 import dev.upaya.kasina.inputkeys.InputKeyHandler
 import dev.upaya.kasina.inputkeys.PressableKeyState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,12 +22,11 @@ class FlashlightStateController @Inject constructor(
 
     private var _flashlightState = MutableStateFlow(FlashlightState.OFF)
 
-    private var flashlightStateJob: Job? = null
-    private var flashlightOnOffJob: Job? = null
-
-    fun start(scope: CoroutineScope) {
-        flashlightOnOffJob = launchFlashlightOnOffJob(scope)
-        flashlightStateJob = launchFlashlightStateJob(scope)
+    suspend fun startControllingFlashlightState(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+        withContext(dispatcher) {
+            launch { launchFlashlightOnOffJob() }
+            launch { launchFlashlightStateJob() }
+        }
     }
 
     fun turnOff() {
@@ -37,7 +37,7 @@ class FlashlightStateController @Inject constructor(
      * This job subscribes to our own flashlight state and turns the actual flashlight on/off
      * accordingly.
      */
-    private fun launchFlashlightOnOffJob(scope: CoroutineScope) = scope.launch {
+    private suspend fun launchFlashlightOnOffJob() {
         _flashlightState.collect { state ->
             when (state) {
                 FlashlightState.OFF -> flashlight.turnOff()
@@ -49,7 +49,7 @@ class FlashlightStateController @Inject constructor(
     /**
      * This jobs keeps the flashlight state updated according to the incoming events.
      */
-    private fun launchFlashlightStateJob(scope: CoroutineScope) = scope.launch {
+    private suspend fun launchFlashlightStateJob() {
         _flashlightState.updateFlashlightStateOnInputEvents(inputKeyHandler.volumeKeysState, flashlight.isOn) { currentState, keyEvent, isFlashlightOn ->
             calcFlashlightState(currentState, keyEvent, isFlashlightOn)
         }
