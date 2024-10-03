@@ -37,7 +37,7 @@ fun MainScreen() {
     }
 
     val flashlightViewModel: FlashlightViewModel = hiltViewModel()
-    val isFlashlightOn = flashlightViewModel.isFlashlightOn.collectAsState(FlashlightEvent(isOn = false))
+    val isFlashlightOn = flashlightViewModel.isFlashlightOn.collectAsState(false)
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Box(modifier = Modifier
@@ -53,7 +53,7 @@ fun MainScreen() {
                     .fillMaxSize(.25f)
                     .aspectRatio(1f, !isLandscape),
                 contentDescription = "Lightbulb",
-                tint = if (isFlashlightOn.value.isOn) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer,
+                tint = if (isFlashlightOn.value) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer,
             )
             Row(
                 modifier = Modifier

@@ -5,6 +5,7 @@ import dev.upaya.kasina.inputkeys.PressableKeyState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,7 +19,7 @@ class FlashlightStateController @Inject constructor(
     private val inputKeyHandler: InputKeyHandler,
 ) {
 
-    val isFlashlightOn = flashlight.isOn
+    val isFlashlightOn = flashlight.events.map { it.isOn }
 
     private var _flashlightState = MutableStateFlow(FlashlightState.OFF)
 
@@ -50,7 +51,7 @@ class FlashlightStateController @Inject constructor(
      * This jobs keeps the flashlight state updated according to the incoming events.
      */
     private suspend fun launchFlashlightStateJob() {
-        _flashlightState.updateFlashlightStateOnInputEvents(inputKeyHandler.volumeKeysState, flashlight.isOn) { currentState, keyEvent, isFlashlightOn ->
+        _flashlightState.updateFlashlightStateOnInputEvents(inputKeyHandler.volumeKeysState, flashlight.events) { currentState, keyEvent, isFlashlightOn ->
             calcFlashlightState(currentState, keyEvent, isFlashlightOn)
         }
     }

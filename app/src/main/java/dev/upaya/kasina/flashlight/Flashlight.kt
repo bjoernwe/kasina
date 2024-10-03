@@ -24,11 +24,11 @@ class Flashlight @Inject constructor(
     @ApplicationContext context: Context,
 ) {
 
-    private val _isOn = MutableStateFlow(FlashlightEvent(isOn = false))
-    val isOn: StateFlow<FlashlightEvent> = _isOn
+    private val _events = MutableStateFlow(FlashlightEvent(isOn = false))
+    val events: StateFlow<FlashlightEvent> = _events
 
     private val turnedOn: Boolean
-        get() = _isOn.value.isOn
+        get() = _events.value.isOn
     private val turnedOff: Boolean
         get() = !turnedOn
 
@@ -38,9 +38,9 @@ class Flashlight @Inject constructor(
     }
     private val torchCallback = object : CameraManager.TorchCallback() {
         override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
-            if (isOn.value.isOn == enabled)
+            if (events.value.isOn == enabled)
                 return
-            _isOn.value = FlashlightEvent(isOn = enabled)
+            _events.value = FlashlightEvent(isOn = enabled)
         }
     }
 
