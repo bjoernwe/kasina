@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.upaya.kasina.R
+import dev.upaya.kasina.flashlight.FlashlightEvent
 import dev.upaya.kasina.flashlight.FlashlightViewModel
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 
@@ -36,7 +37,7 @@ fun MainScreen() {
     }
 
     val flashlightViewModel: FlashlightViewModel = hiltViewModel()
-    val isFlashlightOn = flashlightViewModel.isFlashlightOn.collectAsState(false)
+    val isFlashlightOn = flashlightViewModel.isFlashlightOn.collectAsState(FlashlightEvent(isOn = false))
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Box(modifier = Modifier
@@ -52,7 +53,7 @@ fun MainScreen() {
                     .fillMaxSize(.25f)
                     .aspectRatio(1f, !isLandscape),
                 contentDescription = "Lightbulb",
-                tint = if (isFlashlightOn.value) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer,
+                tint = if (isFlashlightOn.value.isOn) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer,
             )
             Row(
                 modifier = Modifier
