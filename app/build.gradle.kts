@@ -22,6 +22,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
     }
 
     buildTypes {
@@ -62,6 +67,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -75,8 +82,13 @@ dependencies {
 
     implementation(libs.timber)
 
-    kapt(libs.hilt.android.compiler)
+    annotationProcessor(libs.androidx.room.compiler)
 
+    kapt(libs.hilt.android.compiler)
+    //kapt(libs.room.compiler)
+    kapt("androidx.room:room-compiler:2.6.1")
+
+    testImplementation(libs.androidx.room.testing)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)
