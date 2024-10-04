@@ -70,7 +70,7 @@ fun SessionStats(
                     // ON duration
                     Surface(
                         shape = RoundedCornerShape(50, 50),
-                        color = MaterialTheme.colorScheme.primaryContainer,
+                        color = MaterialTheme.colorScheme.tertiaryContainer,
                         modifier = Modifier
                             .weight(offDuration.toFloat().coerceAtLeast(.01f))
                             .fillMaxWidth()
@@ -79,7 +79,7 @@ fun SessionStats(
                     // OFF duration
                     Surface(
                         shape = RoundedCornerShape(0, 0, 50, 50),
-                        color = MaterialTheme.colorScheme.tertiaryContainer,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
                         modifier = Modifier
                             .weight(onDuration.toFloat().coerceAtLeast(.01f))
                             .fillMaxWidth()

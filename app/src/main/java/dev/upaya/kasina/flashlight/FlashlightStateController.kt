@@ -5,6 +5,7 @@ import dev.upaya.kasina.inputkeys.PressableKeyState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,9 +19,8 @@ class FlashlightStateController @Inject constructor(
     private val inputKeyHandler: InputKeyHandler,
 ) {
 
-    val isFlashlightOn = flashlight.events
-
     private var _flashlightState = MutableStateFlow(FlashlightState.OFF)
+    val flashlightState: StateFlow<FlashlightState> = _flashlightState
 
     suspend fun startControllingFlashlightState(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
         withContext(dispatcher) {
@@ -40,8 +40,9 @@ class FlashlightStateController @Inject constructor(
     private suspend fun launchFlashlightOnOffJob() {
         _flashlightState.collect { state ->
             when (state) {
-                FlashlightState.OFF -> flashlight.turnOff()
-                else -> flashlight.turnOn()
+                FlashlightState.OFF            -> flashlight.turnOff()
+                FlashlightState.OFF_IN_SESSION -> flashlight.turnOff()
+                else                           -> flashlight.turnOn()
             }
         }
     }
@@ -92,8 +93,9 @@ private fun calcNextFlashlightState(currentState: FlashlightState, keyEvent: Pre
         FlashlightState.TRANSITION_TO_ON  to PressableKeyState.RELEASED     -> FlashlightState.ON_SWITCHED
         FlashlightState.ON_SWITCHED       to PressableKeyState.PRESSED      -> FlashlightState.TRANSITION_TO_OFF
         FlashlightState.TRANSITION_TO_OFF to PressableKeyState.PRESSED_LONG -> FlashlightState.ON_HOLDING
-        FlashlightState.TRANSITION_TO_OFF to PressableKeyState.RELEASED     -> FlashlightState.OFF
-        FlashlightState.ON_HOLDING        to PressableKeyState.RELEASED     -> FlashlightState.OFF
+        FlashlightState.TRANSITION_TO_OFF to PressableKeyState.RELEASED     -> FlashlightState.OFF_IN_SESSION
+        FlashlightState.ON_HOLDING        to PressableKeyState.RELEASED     -> FlashlightState.OFF_IN_SESSION
+        FlashlightState.OFF_IN_SESSION    to PressableKeyState.PRESSED      -> FlashlightState.OFF
         else -> currentState
     }
 }

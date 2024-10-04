@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.upaya.kasina.R
 import dev.upaya.kasina.data.Session
+import dev.upaya.kasina.data.SessionState
 import dev.upaya.kasina.flashlight.FlashlightViewModel
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 
@@ -41,8 +42,8 @@ fun MainScreen() {
     }
 
     val flashlightViewModel: FlashlightViewModel = hiltViewModel()
-    val isFlashlightOn = flashlightViewModel.isFlashlightOn.collectAsState(false)
     val recentSessions: State<List<Session>> = flashlightViewModel.recentSessions.collectAsState(initial = emptyList())
+    val sessionState = flashlightViewModel.sessionState.collectAsState(SessionState.INACTIVE)
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
@@ -66,7 +67,7 @@ fun MainScreen() {
                     modifier = Modifier.padding(4.dp),
                 )
                 Text(
-                    text = "Press or hold volume buttons to turn flashlight on/off",
+                    text = "Press or hold volume button to turn flashlight on/off",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -83,7 +84,11 @@ fun MainScreen() {
                         .fillMaxSize(.33f)
                         .aspectRatio(1f, !isLandscape),
                     contentDescription = "Lightbulb",
-                    tint = if (isFlashlightOn.value) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer,
+                    tint = when (sessionState.value) {
+                        SessionState.INACTIVE -> MaterialTheme.colorScheme.primaryContainer
+                        SessionState.ACTIVE_ON -> MaterialTheme.colorScheme.onTertiaryContainer
+                        SessionState.ACTIVE_OFF -> MaterialTheme.colorScheme.tertiaryContainer
+                    },
                 )
             }
 
