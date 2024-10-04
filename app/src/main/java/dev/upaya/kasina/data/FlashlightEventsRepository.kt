@@ -21,7 +21,7 @@ class FlashlightEventsRepository @Inject constructor(
 
     private val flashlightEventDao = db.flashlightEventDao()
 
-    val recentSessions = flashlightEventDao.recentEvents(10)
+    val recentSessions = flashlightEventDao.recentEvents(100)
         .map { events ->
             events.map { it.toFlashlightEvent() }
         }.map { events ->

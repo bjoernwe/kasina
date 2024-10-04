@@ -3,18 +3,20 @@ package dev.upaya.kasina.ui
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.upaya.kasina.R
+import dev.upaya.kasina.data.Session
 import dev.upaya.kasina.flashlight.FlashlightViewModel
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 
@@ -39,49 +42,56 @@ fun MainScreen() {
 
     val flashlightViewModel: FlashlightViewModel = hiltViewModel()
     val isFlashlightOn = flashlightViewModel.isFlashlightOn.collectAsState(false)
-    val recentSessions = flashlightViewModel.recentSessions.collectAsState(initial = emptyList())
+    val recentSessions: State<List<Session>> = flashlightViewModel.recentSessions.collectAsState(initial = emptyList())
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Box(modifier = Modifier
+
+        Column(modifier = Modifier
             .padding(innerPadding)
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
             .padding(24.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-            ) {
-                items(recentSessions.value) { session ->
-                    Text(session.toString())
-                }
-            }
-            Icon(
-                painter = painterResource(R.drawable.baseline_lightbulb_circle_24),
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxSize(.25f)
-                    .aspectRatio(1f, !isLandscape),
-                contentDescription = "Lightbulb",
-                tint = if (isFlashlightOn.value) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer,
-            )
+
             Row(
                 modifier = Modifier
-                    .align(Alignment.BottomStart),
+                    .wrapContentHeight(),
             ) {
                 Icon(
                     painter = painterResource(R.drawable.baseline_info_24),
                     contentDescription = "Info",
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    )
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 Spacer(
                     modifier = Modifier.padding(4.dp),
                 )
                 Text(
                     text = "Press or hold volume buttons to turn flashlight on/off",
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+
+            Box(
+                modifier = Modifier
+                    .weight(3f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_lightbulb_circle_24),
+                    modifier = Modifier
+                        .fillMaxSize(.33f)
+                        .aspectRatio(1f, !isLandscape),
+                    contentDescription = "Lightbulb",
+                    tint = if (isFlashlightOn.value) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer,
+                )
+            }
+
+            SessionStats(
+                sessions = recentSessions.value,
+                modifier = Modifier
+                    .weight(1f),
+            )
         }
     }
 }
