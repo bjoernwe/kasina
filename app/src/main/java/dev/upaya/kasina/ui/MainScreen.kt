@@ -63,7 +63,7 @@ fun MainScreen() {
                     .fillMaxSize(.25f)
                     .aspectRatio(1f, !isLandscape),
                 contentDescription = "Lightbulb",
-                tint = if (isFlashlightOn.value) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer,
+                tint = if (isFlashlightOn.value) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer,
             )
             Row(
                 modifier = Modifier
