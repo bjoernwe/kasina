@@ -3,7 +3,6 @@ package dev.upaya.kasina.data
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import dev.upaya.kasina.flashlight.FlashlightEvent
 import java.time.OffsetDateTime
 import java.time.ZoneId
 

@@ -3,7 +3,6 @@ package dev.upaya.kasina.data
 import android.content.Context
 import androidx.room.Room
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dev.upaya.kasina.flashlight.FlashlightEvent
 import kotlinx.coroutines.flow.map
 import java.util.LinkedList
 import javax.inject.Inject

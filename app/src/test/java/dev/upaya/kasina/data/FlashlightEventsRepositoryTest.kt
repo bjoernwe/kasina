@@ -1,6 +1,5 @@
 package dev.upaya.kasina.data
 
-import dev.upaya.kasina.flashlight.FlashlightEvent
 import org.junit.Assert
 import org.junit.Test
 import java.time.Instant

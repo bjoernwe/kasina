@@ -3,6 +3,7 @@ package dev.upaya.kasina.flashlight
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.upaya.kasina.data.FlashlightEvent
 import dev.upaya.kasina.data.FlashlightEventsRepository
 import dev.upaya.kasina.data.Session
 import dev.upaya.kasina.inputkeys.InputKeyHandler
@@ -28,7 +29,7 @@ class FlashlightViewModel @Inject constructor(
             flashlightStateController.startControllingFlashlightState()
         }
         viewModelScope.launch {
-            flashlight.events.collect { flashlightEventsRepository.storeEvent(it) }
+            flashlight.events.collect { flashlightEventsRepository.storeEvent(FlashlightEvent(it)) }
         }
     }
 

@@ -1,4 +1,4 @@
-package dev.upaya.kasina.flashlight
+package dev.upaya.kasina.data
 
 import java.time.Instant
 

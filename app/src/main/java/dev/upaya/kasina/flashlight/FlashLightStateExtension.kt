@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 
 
-internal suspend fun MutableStateFlow<FlashlightState>.updateFlashlightStateOnInputEvents(volumeKeysState: Flow<PressableKeyState>, isFlashlightOn: StateFlow<FlashlightEvent>, calcNewState: (FlashlightState, PressableKeyState, Boolean) -> FlashlightState) {
+internal suspend fun MutableStateFlow<FlashlightState>.updateFlashlightStateOnInputEvents(volumeKeysState: Flow<PressableKeyState>, isFlashlightOn: StateFlow<Boolean>, calcNewState: (FlashlightState, PressableKeyState, Boolean) -> FlashlightState) {
     volumeKeysState
-        .combine(isFlashlightOn) { keyEvent, flashlightEvent -> keyEvent to flashlightEvent.isOn }
+        .combine(isFlashlightOn) { keyEvent, flashlightEvent -> keyEvent to flashlightEvent }
         .collect { (keyEvent, isOn) ->
             this.update { currentState ->
                 calcNewState(currentState, keyEvent, isOn)
