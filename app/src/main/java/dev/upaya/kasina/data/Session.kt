@@ -25,8 +25,8 @@ data class Session(
         get() = timestampStart == null || timestampEnd == null
 
     val onDuration: Long
-        get() = if (timestampStart == null) 0 else timestampStart!! - timestampFlash
+        get() = if (timestampStart == null) 0 else (timestampStart - timestampFlash)
 
     val offDuration: Long
-        get() = if (timestampStart == null || timestampEnd == null) 0 else timestampEnd!! - timestampStart!!
+        get() = if (timestampStart == null || timestampEnd == null) 0 else (timestampEnd - timestampStart)
 }
