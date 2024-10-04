@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "7532b29f5402967f85813e6e6cd348a7",
+    "identityHash": "4ef9870f5b0c6444dc14dcb559c51f9a",
     "entities": [
       {
-        "tableName": "flashlight_events",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `is_on` INTEGER NOT NULL, `timestamp` TEXT NOT NULL)",
+        "tableName": "sessions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `timestamp_flash` INTEGER NOT NULL, `timestamp_start` INTEGER, `timestamp_end` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -15,16 +15,22 @@
             "notNull": false
           },
           {
-            "fieldPath": "isOn",
-            "columnName": "is_on",
+            "fieldPath": "timestampFlash",
+            "columnName": "timestamp_flash",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "date",
-            "columnName": "timestamp",
-            "affinity": "TEXT",
-            "notNull": true
+            "fieldPath": "timestampStart",
+            "columnName": "timestamp_start",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "timestampEnd",
+            "columnName": "timestamp_end",
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -35,13 +41,13 @@
         },
         "indices": [
           {
-            "name": "index_flashlight_events_timestamp",
+            "name": "index_sessions_timestamp_flash",
             "unique": false,
             "columnNames": [
-              "timestamp"
+              "timestamp_flash"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_flashlight_events_timestamp` ON `${TABLE_NAME}` (`timestamp`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sessions_timestamp_flash` ON `${TABLE_NAME}` (`timestamp_flash`)"
           }
         ],
         "foreignKeys": []
@@ -50,7 +56,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7532b29f5402967f85813e6e6cd348a7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4ef9870f5b0c6444dc14dcb559c51f9a')"
     ]
   }
 }

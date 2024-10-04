@@ -3,34 +3,29 @@ package dev.upaya.kasina.flashlight
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.upaya.kasina.data.FlashlightEvent
-import dev.upaya.kasina.data.FlashlightEventsRepository
-import dev.upaya.kasina.data.Session
-import dev.upaya.kasina.data.toSessionState
+import dev.upaya.kasina.data.SessionStateRepository
 import dev.upaya.kasina.inputkeys.InputKeyHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
 class FlashlightViewModel @Inject constructor(
-    private val flashlight: Flashlight,
     private val inputKeyHandler: InputKeyHandler,
     private val flashlightStateController: FlashlightStateController,
-    private val flashlightEventsRepository: FlashlightEventsRepository,
+    private val sessionStateRepository: SessionStateRepository,
 ) : ViewModel() {
 
-    val recentSessions: Flow<List<Session>> = flashlightEventsRepository.recentSessions
-    val sessionState = flashlightStateController.flashlightState.toSessionState()
+    val sessionState = sessionStateRepository.sessionState
+    val recentSessions = sessionStateRepository.recentSessions
 
     init {
         viewModelScope.launch {
             flashlightStateController.startControllingFlashlightState()
         }
         viewModelScope.launch {
-            flashlight.events.collect { flashlightEventsRepository.storeEvent(FlashlightEvent(it)) }
+            sessionStateRepository.startStoringSessions()
         }
     }
 
