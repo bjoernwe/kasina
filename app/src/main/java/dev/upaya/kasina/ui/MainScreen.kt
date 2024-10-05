@@ -99,7 +99,7 @@ fun MainScreen() {
                     modifier = Modifier.padding(4.dp),
                 )
                 Text(
-                    text = "Press or hold volume button to turn flashlight on/off",
+                    text = "Press/hold physical buttons to start",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
