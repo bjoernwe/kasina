@@ -3,6 +3,21 @@ package dev.upaya.kasina
 import android.graphics.Color
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_BUTTON_A
+import android.view.KeyEvent.KEYCODE_BUTTON_B
+import android.view.KeyEvent.KEYCODE_BUTTON_L1
+import android.view.KeyEvent.KEYCODE_BUTTON_L2
+import android.view.KeyEvent.KEYCODE_BUTTON_R1
+import android.view.KeyEvent.KEYCODE_BUTTON_R2
+import android.view.KeyEvent.KEYCODE_BUTTON_X
+import android.view.KeyEvent.KEYCODE_BUTTON_Y
+import android.view.KeyEvent.KEYCODE_DPAD_DOWN
+import android.view.KeyEvent.KEYCODE_DPAD_LEFT
+import android.view.KeyEvent.KEYCODE_DPAD_RIGHT
+import android.view.KeyEvent.KEYCODE_DPAD_UP
+import android.view.KeyEvent.KEYCODE_HEADSETHOOK
+import android.view.KeyEvent.KEYCODE_VOLUME_DOWN
+import android.view.KeyEvent.KEYCODE_VOLUME_UP
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -20,8 +35,21 @@ import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 class MainActivity : ComponentActivity() {
 
     private val inputKeys = setOf(
-        KeyEvent.KEYCODE_VOLUME_DOWN,
-        KeyEvent.KEYCODE_VOLUME_UP,
+        KEYCODE_VOLUME_DOWN,
+        KEYCODE_VOLUME_UP,
+        KEYCODE_DPAD_UP,
+        KEYCODE_DPAD_DOWN,
+        KEYCODE_DPAD_LEFT,
+        KEYCODE_DPAD_RIGHT,
+        KEYCODE_BUTTON_A,
+        KEYCODE_BUTTON_B,
+        KEYCODE_BUTTON_X,
+        KEYCODE_BUTTON_Y,
+        KEYCODE_BUTTON_L1,
+        KEYCODE_BUTTON_L2,
+        KEYCODE_BUTTON_R1,
+        KEYCODE_BUTTON_R2,
+        KEYCODE_HEADSETHOOK,
     )
 
     private lateinit var flashlightViewModel: FlashlightViewModel
