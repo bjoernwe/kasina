@@ -30,20 +30,12 @@ class FlashlightViewModel @Inject constructor(
         }
     }
 
-    fun handleVolumeDownPress(scope: CoroutineScope) {
-        inputKeyHandler.handleVolumeDownPress(scope = scope)
+    fun handleButtonPress(scope: CoroutineScope) {
+        inputKeyHandler.handleButtonPress(scope = scope)
     }
 
-    fun handleVolumeUpPress(scope: CoroutineScope) {
-        inputKeyHandler.handleVolumeUpPress(scope = scope)
-    }
-
-    fun handleVolumeDownRelease() {
-        inputKeyHandler.handleVolumeDownRelease()
-    }
-
-    fun handleVolumeUpRelease() {
-        inputKeyHandler.handleVolumeUpRelease()
+    fun handleButtonRelease() {
+        inputKeyHandler.handleButtonRelease()
     }
 
     fun turnFlashOff() {

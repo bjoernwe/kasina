@@ -19,6 +19,11 @@ import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val inputKeys = setOf(
+        KeyEvent.KEYCODE_VOLUME_DOWN,
+        KeyEvent.KEYCODE_VOLUME_UP,
+    )
+
     private lateinit var flashlightViewModel: FlashlightViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,19 +48,22 @@ class MainActivity : ComponentActivity() {
         if (keyCode == KeyEvent.KEYCODE_BACK)
             return super.onKeyDown(keyCode, event)
 
-        return when (keyCode) {
-            KeyEvent.KEYCODE_VOLUME_DOWN -> { flashlightViewModel.handleVolumeDownPress(lifecycleScope); true }
-            KeyEvent.KEYCODE_VOLUME_UP -> { flashlightViewModel.handleVolumeUpPress(lifecycleScope); true }
-            else -> { super.onKeyDown(keyCode, event) }
+        if (keyCode in inputKeys) {
+            flashlightViewModel.handleButtonPress(lifecycleScope)
+            return true
         }
+
+        return super.onKeyDown(keyCode, event)
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        return when (keyCode) {
-            KeyEvent.KEYCODE_VOLUME_DOWN -> { flashlightViewModel.handleVolumeDownRelease(); true }
-            KeyEvent.KEYCODE_VOLUME_UP -> { flashlightViewModel.handleVolumeUpRelease(); true }
-            else -> { super.onKeyUp(keyCode, event) }
+
+        if (keyCode in inputKeys) {
+            flashlightViewModel.handleButtonRelease()
+            return true
         }
+
+        return super.onKeyUp(keyCode, event)
     }
 
     override fun onPause() {

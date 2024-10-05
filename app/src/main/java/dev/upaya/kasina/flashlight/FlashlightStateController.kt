@@ -1,7 +1,7 @@
 package dev.upaya.kasina.flashlight
 
 import dev.upaya.kasina.inputkeys.InputKeyHandler
-import dev.upaya.kasina.inputkeys.PressableKeyState
+import dev.upaya.kasina.inputkeys.PressableButtonState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,14 +51,14 @@ class FlashlightStateController @Inject constructor(
      * This jobs keeps the flashlight state updated according to the incoming events.
      */
     private suspend fun launchFlashlightStateJob() {
-        _flashlightState.updateFlashlightStateOnInputEvents(inputKeyHandler.volumeKeysState, flashlight.events) { currentState, keyEvent, isFlashlightOn ->
+        _flashlightState.updateFlashlightStateOnInputEvents(inputKeyHandler.buttonState, flashlight.events) { currentState, keyEvent, isFlashlightOn ->
             calcFlashlightState(currentState, keyEvent, isFlashlightOn)
         }
     }
 }
 
 
-private fun calcFlashlightState(currentState: FlashlightState, keyEvent: PressableKeyState, isFlashlightOn: Boolean): FlashlightState {
+private fun calcFlashlightState(currentState: FlashlightState, keyEvent: PressableButtonState, isFlashlightOn: Boolean): FlashlightState {
 
     // Did the user turn the flashlight on/off manually?
     if (!isStateCongruentWithFlashlight(currentState, isFlashlightOn))
@@ -86,16 +86,16 @@ private fun getFixedFlashlightState(isFlashlightOn: Boolean): FlashlightState {
 }
 
 
-private fun calcNextFlashlightState(currentState: FlashlightState, keyEvent: PressableKeyState): FlashlightState {
+private fun calcNextFlashlightState(currentState: FlashlightState, keyEvent: PressableButtonState): FlashlightState {
     return when (currentState to keyEvent) {
-        FlashlightState.OFF               to PressableKeyState.PRESSED      -> FlashlightState.TRANSITION_TO_ON
-        FlashlightState.TRANSITION_TO_ON  to PressableKeyState.PRESSED_LONG -> FlashlightState.ON_HOLDING
-        FlashlightState.TRANSITION_TO_ON  to PressableKeyState.RELEASED     -> FlashlightState.ON_SWITCHED
-        FlashlightState.ON_SWITCHED       to PressableKeyState.PRESSED      -> FlashlightState.TRANSITION_TO_OFF
-        FlashlightState.TRANSITION_TO_OFF to PressableKeyState.PRESSED_LONG -> FlashlightState.ON_HOLDING
-        FlashlightState.TRANSITION_TO_OFF to PressableKeyState.RELEASED     -> FlashlightState.OFF_IN_SESSION
-        FlashlightState.ON_HOLDING        to PressableKeyState.RELEASED     -> FlashlightState.OFF_IN_SESSION
-        FlashlightState.OFF_IN_SESSION    to PressableKeyState.PRESSED      -> FlashlightState.OFF
+        FlashlightState.OFF               to PressableButtonState.PRESSED      -> FlashlightState.TRANSITION_TO_ON
+        FlashlightState.TRANSITION_TO_ON  to PressableButtonState.PRESSED_LONG -> FlashlightState.ON_HOLDING
+        FlashlightState.TRANSITION_TO_ON  to PressableButtonState.RELEASED     -> FlashlightState.ON_SWITCHED
+        FlashlightState.ON_SWITCHED       to PressableButtonState.PRESSED      -> FlashlightState.TRANSITION_TO_OFF
+        FlashlightState.TRANSITION_TO_OFF to PressableButtonState.PRESSED_LONG -> FlashlightState.ON_HOLDING
+        FlashlightState.TRANSITION_TO_OFF to PressableButtonState.RELEASED     -> FlashlightState.OFF_IN_SESSION
+        FlashlightState.ON_HOLDING        to PressableButtonState.RELEASED     -> FlashlightState.OFF_IN_SESSION
+        FlashlightState.OFF_IN_SESSION    to PressableButtonState.PRESSED      -> FlashlightState.OFF
         else -> currentState
     }
 }
