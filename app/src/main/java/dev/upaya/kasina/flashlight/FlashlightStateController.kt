@@ -99,6 +99,7 @@ private fun calcNextFlashlightState(currentState: FlashlightState, keyEvent: Pre
     return when (currentState to keyEvent) {
     //  currentState      && keyEvent     -> newState
         OFF               to PRESSED      -> TRANSITION_TO_ON
+        OFF               to PRESSED_LONG -> ON_HOLDING
         TRANSITION_TO_ON  to PRESSED_LONG -> ON_HOLDING
         TRANSITION_TO_ON  to RELEASED     -> ON_SWITCHED
         ON_SWITCHED       to PRESSED      -> TRANSITION_TO_OFF
