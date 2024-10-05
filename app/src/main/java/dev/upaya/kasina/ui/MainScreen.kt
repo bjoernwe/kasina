@@ -2,6 +2,8 @@ package dev.upaya.kasina.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -59,6 +62,11 @@ fun MainScreen() {
     val currentSession by flashlightViewModel.currentSession.collectAsState(initial = null)
 
     var sessionDuration by remember { mutableStateOf(0.toDuration(DurationUnit.SECONDS)) }
+
+    // Simulate a key press on value change
+    val interactionSource = remember { MutableInteractionSource() }.also {
+        LaunchedEffect(sessionState.value) { it.simulatePress() }
+    }
 
     LaunchedEffect(currentSession) {
         while (true) {
@@ -118,13 +126,18 @@ fun MainScreen() {
                         painter = painterResource(R.drawable.baseline_lightbulb_circle_24),
                         modifier = Modifier
                             .fillMaxSize(.4f)
-                            .aspectRatio(1f, !isLandscape),
+                            .aspectRatio(1f, !isLandscape)
+                            .clickable(
+                                onClick = {},
+                                interactionSource = interactionSource,
+                                indication = ripple(
+                                    bounded = false,
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                ),
+                            )
+                        ,
                         contentDescription = "Lightbulb",
-                        tint = when (sessionState.value) {
-                            SessionState.INACTIVE -> MaterialTheme.colorScheme.primaryContainer
-                            SessionState.ACTIVE_ON -> MaterialTheme.colorScheme.onTertiaryContainer
-                            SessionState.ACTIVE_OFF -> MaterialTheme.colorScheme.tertiaryContainer
-                        },
+                        tint = sessionState.value.getColor(),
                     )
                     Text(
                         text = if (sessionState.value == SessionState.ACTIVE_OFF) String.format(
