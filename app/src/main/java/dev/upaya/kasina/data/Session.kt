@@ -3,6 +3,7 @@ package dev.upaya.kasina.data
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.Instant
 
 
 @Entity(tableName = "sessions")
@@ -29,4 +30,7 @@ data class Session(
 
     val offDuration: Long
         get() = if (timestampStart == null || timestampEnd == null) 0 else (timestampEnd - timestampStart)
+
+    val start: Instant?
+        get() = timestampStart?.let { Instant.ofEpochMilli(it) }
 }

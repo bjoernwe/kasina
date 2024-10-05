@@ -19,6 +19,7 @@ class FlashlightViewModel @Inject constructor(
 
     val sessionState = sessionStateRepository.sessionState
     val recentSessions = sessionStateRepository.recentSessions
+    val currentSession = sessionStateRepository.currentSession
 
     init {
         viewModelScope.launch {

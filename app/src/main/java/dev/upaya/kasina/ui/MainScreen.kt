@@ -16,9 +16,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -31,6 +35,11 @@ import dev.upaya.kasina.data.Session
 import dev.upaya.kasina.data.SessionState
 import dev.upaya.kasina.flashlight.FlashlightViewModel
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
+import kotlinx.coroutines.delay
+import java.time.Instant
+import java.util.Locale
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 
 @Composable
@@ -44,6 +53,18 @@ fun MainScreen() {
     val flashlightViewModel: FlashlightViewModel = hiltViewModel()
     val recentSessions: State<List<Session>> = flashlightViewModel.recentSessions.collectAsState(initial = emptyList())
     val sessionState = flashlightViewModel.sessionState.collectAsState(SessionState.INACTIVE)
+    val currentSession by flashlightViewModel.currentSession.collectAsState(initial = null)
+
+    var sessionDuration by remember { mutableStateOf(0.toDuration(DurationUnit.SECONDS)) }
+
+    LaunchedEffect(currentSession) {
+        while (true) {
+            if (currentSession != null && currentSession!!.start != null) {
+                sessionDuration = (Instant.now().toEpochMilli() - currentSession!!.start!!.toEpochMilli()).toDuration(DurationUnit.MILLISECONDS)
+            }
+            delay(100L)
+        }
+    }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
@@ -78,18 +99,34 @@ fun MainScreen() {
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_lightbulb_circle_24),
+                Column(
                     modifier = Modifier
-                        .fillMaxSize(.33f)
-                        .aspectRatio(1f, !isLandscape),
-                    contentDescription = "Lightbulb",
-                    tint = when (sessionState.value) {
-                        SessionState.INACTIVE -> MaterialTheme.colorScheme.primaryContainer
-                        SessionState.ACTIVE_ON -> MaterialTheme.colorScheme.onTertiaryContainer
-                        SessionState.ACTIVE_OFF -> MaterialTheme.colorScheme.tertiaryContainer
-                    },
-                )
+                        .align(Alignment.Center),
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_lightbulb_circle_24),
+                        modifier = Modifier
+                            .fillMaxSize(.33f)
+                            .aspectRatio(1f, !isLandscape),
+                        contentDescription = "Lightbulb",
+                        tint = when (sessionState.value) {
+                            SessionState.INACTIVE -> MaterialTheme.colorScheme.primaryContainer
+                            SessionState.ACTIVE_ON -> MaterialTheme.colorScheme.onTertiaryContainer
+                            SessionState.ACTIVE_OFF -> MaterialTheme.colorScheme.tertiaryContainer
+                        },
+                    )
+                    Text(
+                        text = if (sessionState.value == SessionState.ACTIVE_OFF) String.format(
+                            Locale.ROOT,"%02d:%02d:%02d",
+                            sessionDuration.inWholeHours,
+                            sessionDuration.inWholeMinutes % 60,
+                            sessionDuration.inWholeSeconds % 60,
+                        ) else "",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
             }
 
             SessionStats(

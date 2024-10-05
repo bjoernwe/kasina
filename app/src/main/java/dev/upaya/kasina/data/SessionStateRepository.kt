@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,7 +35,8 @@ class SessionStateRepository @Inject constructor(
     // We could emit sessions directly, but this way the DB is the single source of truth
     val recentSessions = sessionDao.recentSessions(limit = 10)
 
-    private var _currentSession = MutableStateFlow<Session?>(null)
+    private val _currentSession = MutableStateFlow<Session?>(null)
+    val currentSession: StateFlow<Session?> = _currentSession
 
     suspend fun startStoringSessions(dispatcher: CoroutineDispatcher = Dispatchers.IO) {
         withContext(dispatcher) {
