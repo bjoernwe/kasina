@@ -7,13 +7,13 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 
-class PressableKey(private val longPressThresholdMillis: Long = 200L) {
+class PressableButton(private val longPressThresholdMillis: Long = 200L) {
 
-    private val _keyState = MutableStateFlow(PressableKeyState.RELEASED)
-    val keyState: SharedFlow<PressableKeyState> = _keyState
+    private val _buttonState = MutableStateFlow(PressableButtonState.RELEASED)
+    val buttonState: SharedFlow<PressableButtonState> = _buttonState
 
     private val isPressed
-        get() = _keyState.value != PressableKeyState.RELEASED
+        get() = _buttonState.value != PressableButtonState.RELEASED
 
     private val isReleased
         get() = !isPressed
@@ -23,7 +23,7 @@ class PressableKey(private val longPressThresholdMillis: Long = 200L) {
         if (isReleased)
             return
 
-        _keyState.tryEmit(PressableKeyState.RELEASED)
+        _buttonState.tryEmit(PressableButtonState.RELEASED)
     }
 
     fun press(scope: CoroutineScope) {
@@ -31,7 +31,7 @@ class PressableKey(private val longPressThresholdMillis: Long = 200L) {
         if (isPressed)
             return
 
-        _keyState.tryEmit(PressableKeyState.PRESSED)
+        _buttonState.tryEmit(PressableButtonState.PRESSED)
 
         scope.launch {
             waitAndEmitShortOrLongPressEvent()
@@ -41,9 +41,9 @@ class PressableKey(private val longPressThresholdMillis: Long = 200L) {
     private suspend fun waitAndEmitShortOrLongPressEvent() {
         delay(longPressThresholdMillis)
         if (isPressed) {
-            _keyState.value = PressableKeyState.PRESSED_LONG
+            _buttonState.value = PressableButtonState.PRESSED_LONG
         } else {
-            _keyState.value = PressableKeyState.RELEASED
+            _buttonState.value = PressableButtonState.RELEASED
         }
     }
 }

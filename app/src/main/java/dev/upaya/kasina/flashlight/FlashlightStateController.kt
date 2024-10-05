@@ -1,7 +1,16 @@
 package dev.upaya.kasina.flashlight
 
+import dev.upaya.kasina.flashlight.FlashlightState.OFF
+import dev.upaya.kasina.flashlight.FlashlightState.OFF_IN_SESSION
+import dev.upaya.kasina.flashlight.FlashlightState.TRANSITION_TO_ON
+import dev.upaya.kasina.flashlight.FlashlightState.TRANSITION_TO_OFF
+import dev.upaya.kasina.flashlight.FlashlightState.ON_HOLDING
+import dev.upaya.kasina.flashlight.FlashlightState.ON_SWITCHED
+import dev.upaya.kasina.inputkeys.PressableButtonState.RELEASED
+import dev.upaya.kasina.inputkeys.PressableButtonState.PRESSED
+import dev.upaya.kasina.inputkeys.PressableButtonState.PRESSED_LONG
 import dev.upaya.kasina.inputkeys.InputKeyHandler
-import dev.upaya.kasina.inputkeys.PressableKeyState
+import dev.upaya.kasina.inputkeys.PressableButtonState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +28,7 @@ class FlashlightStateController @Inject constructor(
     private val inputKeyHandler: InputKeyHandler,
 ) {
 
-    private var _flashlightState = MutableStateFlow(FlashlightState.OFF)
+    private var _flashlightState = MutableStateFlow(OFF)
     val flashlightState: StateFlow<FlashlightState> = _flashlightState
 
     suspend fun startControllingFlashlightState(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
@@ -30,7 +39,7 @@ class FlashlightStateController @Inject constructor(
     }
 
     fun turnOff() {
-        _flashlightState.update { FlashlightState.OFF }
+        _flashlightState.update { OFF }
     }
 
     /**
@@ -40,9 +49,9 @@ class FlashlightStateController @Inject constructor(
     private suspend fun launchFlashlightOnOffJob() {
         _flashlightState.collect { state ->
             when (state) {
-                FlashlightState.OFF            -> flashlight.turnOff()
-                FlashlightState.OFF_IN_SESSION -> flashlight.turnOff()
-                else                           -> flashlight.turnOn()
+                OFF            -> flashlight.turnOff()
+                OFF_IN_SESSION -> flashlight.turnOff()
+                else           -> flashlight.turnOn()
             }
         }
     }
@@ -51,14 +60,14 @@ class FlashlightStateController @Inject constructor(
      * This jobs keeps the flashlight state updated according to the incoming events.
      */
     private suspend fun launchFlashlightStateJob() {
-        _flashlightState.updateFlashlightStateOnInputEvents(inputKeyHandler.volumeKeysState, flashlight.events) { currentState, keyEvent, isFlashlightOn ->
+        _flashlightState.updateFlashlightStateOnInputEvents(inputKeyHandler.buttonState, flashlight.events) { currentState, keyEvent, isFlashlightOn ->
             calcFlashlightState(currentState, keyEvent, isFlashlightOn)
         }
     }
 }
 
 
-private fun calcFlashlightState(currentState: FlashlightState, keyEvent: PressableKeyState, isFlashlightOn: Boolean): FlashlightState {
+private fun calcFlashlightState(currentState: FlashlightState, keyEvent: PressableButtonState, isFlashlightOn: Boolean): FlashlightState {
 
     // Did the user turn the flashlight on/off manually?
     if (!isStateCongruentWithFlashlight(currentState, isFlashlightOn))
@@ -74,28 +83,29 @@ private fun calcFlashlightState(currentState: FlashlightState, keyEvent: Pressab
  */
 private fun isStateCongruentWithFlashlight(currentState: FlashlightState, isFlashlightOn: Boolean): Boolean {
     return when (currentState to isFlashlightOn) {
-        FlashlightState.OFF         to true  -> false  // Flash is on but we don't know it
-        FlashlightState.ON_SWITCHED to false -> false  // Flash is off but we don't know it
+        OFF         to true  -> false  // Flash is on but we don't know it
+        ON_SWITCHED to false -> false  // Flash is off but we don't know it
         else -> true
     }
 }
 
 
 private fun getFixedFlashlightState(isFlashlightOn: Boolean): FlashlightState {
-    return if (isFlashlightOn) FlashlightState.ON_SWITCHED else FlashlightState.OFF
+    return if (isFlashlightOn) ON_SWITCHED else OFF
 }
 
 
-private fun calcNextFlashlightState(currentState: FlashlightState, keyEvent: PressableKeyState): FlashlightState {
+private fun calcNextFlashlightState(currentState: FlashlightState, keyEvent: PressableButtonState): FlashlightState {
     return when (currentState to keyEvent) {
-        FlashlightState.OFF               to PressableKeyState.PRESSED      -> FlashlightState.TRANSITION_TO_ON
-        FlashlightState.TRANSITION_TO_ON  to PressableKeyState.PRESSED_LONG -> FlashlightState.ON_HOLDING
-        FlashlightState.TRANSITION_TO_ON  to PressableKeyState.RELEASED     -> FlashlightState.ON_SWITCHED
-        FlashlightState.ON_SWITCHED       to PressableKeyState.PRESSED      -> FlashlightState.TRANSITION_TO_OFF
-        FlashlightState.TRANSITION_TO_OFF to PressableKeyState.PRESSED_LONG -> FlashlightState.ON_HOLDING
-        FlashlightState.TRANSITION_TO_OFF to PressableKeyState.RELEASED     -> FlashlightState.OFF_IN_SESSION
-        FlashlightState.ON_HOLDING        to PressableKeyState.RELEASED     -> FlashlightState.OFF_IN_SESSION
-        FlashlightState.OFF_IN_SESSION    to PressableKeyState.PRESSED      -> FlashlightState.OFF
+    //  currentState      && keyEvent     -> newState
+        OFF               to PRESSED      -> TRANSITION_TO_ON
+        TRANSITION_TO_ON  to PRESSED_LONG -> ON_HOLDING
+        TRANSITION_TO_ON  to RELEASED     -> ON_SWITCHED
+        ON_SWITCHED       to PRESSED      -> TRANSITION_TO_OFF
+        TRANSITION_TO_OFF to PRESSED_LONG -> ON_HOLDING
+        TRANSITION_TO_OFF to RELEASED     -> OFF_IN_SESSION
+        ON_HOLDING        to RELEASED     -> OFF_IN_SESSION
+        OFF_IN_SESSION    to PRESSED      -> OFF
         else -> currentState
     }
 }

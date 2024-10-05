@@ -1,7 +1,7 @@
 package dev.upaya.kasina.inputkeys
 
 
-enum class PressableKeyState {
+enum class PressableButtonState {
     RELEASED,
     PRESSED,
     PRESSED_LONG,
