@@ -1,5 +1,14 @@
 package dev.upaya.kasina.flashlight
 
+import dev.upaya.kasina.flashlight.FlashlightState.OFF
+import dev.upaya.kasina.flashlight.FlashlightState.OFF_IN_SESSION
+import dev.upaya.kasina.flashlight.FlashlightState.TRANSITION_TO_ON
+import dev.upaya.kasina.flashlight.FlashlightState.TRANSITION_TO_OFF
+import dev.upaya.kasina.flashlight.FlashlightState.ON_HOLDING
+import dev.upaya.kasina.flashlight.FlashlightState.ON_SWITCHED
+import dev.upaya.kasina.inputkeys.PressableButtonState.RELEASED
+import dev.upaya.kasina.inputkeys.PressableButtonState.PRESSED
+import dev.upaya.kasina.inputkeys.PressableButtonState.PRESSED_LONG
 import dev.upaya.kasina.inputkeys.InputKeyHandler
 import dev.upaya.kasina.inputkeys.PressableButtonState
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,7 +28,7 @@ class FlashlightStateController @Inject constructor(
     private val inputKeyHandler: InputKeyHandler,
 ) {
 
-    private var _flashlightState = MutableStateFlow(FlashlightState.OFF)
+    private var _flashlightState = MutableStateFlow(OFF)
     val flashlightState: StateFlow<FlashlightState> = _flashlightState
 
     suspend fun startControllingFlashlightState(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
@@ -30,7 +39,7 @@ class FlashlightStateController @Inject constructor(
     }
 
     fun turnOff() {
-        _flashlightState.update { FlashlightState.OFF }
+        _flashlightState.update { OFF }
     }
 
     /**
@@ -40,9 +49,9 @@ class FlashlightStateController @Inject constructor(
     private suspend fun launchFlashlightOnOffJob() {
         _flashlightState.collect { state ->
             when (state) {
-                FlashlightState.OFF            -> flashlight.turnOff()
-                FlashlightState.OFF_IN_SESSION -> flashlight.turnOff()
-                else                           -> flashlight.turnOn()
+                OFF            -> flashlight.turnOff()
+                OFF_IN_SESSION -> flashlight.turnOff()
+                else           -> flashlight.turnOn()
             }
         }
     }
@@ -74,28 +83,29 @@ private fun calcFlashlightState(currentState: FlashlightState, keyEvent: Pressab
  */
 private fun isStateCongruentWithFlashlight(currentState: FlashlightState, isFlashlightOn: Boolean): Boolean {
     return when (currentState to isFlashlightOn) {
-        FlashlightState.OFF         to true  -> false  // Flash is on but we don't know it
-        FlashlightState.ON_SWITCHED to false -> false  // Flash is off but we don't know it
+        OFF         to true  -> false  // Flash is on but we don't know it
+        ON_SWITCHED to false -> false  // Flash is off but we don't know it
         else -> true
     }
 }
 
 
 private fun getFixedFlashlightState(isFlashlightOn: Boolean): FlashlightState {
-    return if (isFlashlightOn) FlashlightState.ON_SWITCHED else FlashlightState.OFF
+    return if (isFlashlightOn) ON_SWITCHED else OFF
 }
 
 
 private fun calcNextFlashlightState(currentState: FlashlightState, keyEvent: PressableButtonState): FlashlightState {
     return when (currentState to keyEvent) {
-        FlashlightState.OFF               to PressableButtonState.PRESSED      -> FlashlightState.TRANSITION_TO_ON
-        FlashlightState.TRANSITION_TO_ON  to PressableButtonState.PRESSED_LONG -> FlashlightState.ON_HOLDING
-        FlashlightState.TRANSITION_TO_ON  to PressableButtonState.RELEASED     -> FlashlightState.ON_SWITCHED
-        FlashlightState.ON_SWITCHED       to PressableButtonState.PRESSED      -> FlashlightState.TRANSITION_TO_OFF
-        FlashlightState.TRANSITION_TO_OFF to PressableButtonState.PRESSED_LONG -> FlashlightState.ON_HOLDING
-        FlashlightState.TRANSITION_TO_OFF to PressableButtonState.RELEASED     -> FlashlightState.OFF_IN_SESSION
-        FlashlightState.ON_HOLDING        to PressableButtonState.RELEASED     -> FlashlightState.OFF_IN_SESSION
-        FlashlightState.OFF_IN_SESSION    to PressableButtonState.PRESSED      -> FlashlightState.OFF
+    //  currentState      && keyEvent     -> newState
+        OFF               to PRESSED      -> TRANSITION_TO_ON
+        TRANSITION_TO_ON  to PRESSED_LONG -> ON_HOLDING
+        TRANSITION_TO_ON  to RELEASED     -> ON_SWITCHED
+        ON_SWITCHED       to PRESSED      -> TRANSITION_TO_OFF
+        TRANSITION_TO_OFF to PRESSED_LONG -> ON_HOLDING
+        TRANSITION_TO_OFF to RELEASED     -> OFF_IN_SESSION
+        ON_HOLDING        to RELEASED     -> OFF_IN_SESSION
+        OFF_IN_SESSION    to PRESSED      -> OFF
         else -> currentState
     }
 }
