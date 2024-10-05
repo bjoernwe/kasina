@@ -1,9 +1,11 @@
 package dev.upaya.kasina
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
@@ -21,10 +23,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+        )
         super.onCreate(savedInstanceState)
+
         flashlightViewModel = ViewModelProvider(this)[FlashlightViewModel::class.java]
 
-        enableEdgeToEdge()
         setContent {
             FlashKasinaTheme(darkTheme = true, dynamicColor = false) {
                 MainScreen()
