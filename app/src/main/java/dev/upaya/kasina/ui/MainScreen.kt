@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -101,13 +102,13 @@ fun MainScreen() {
                 Icon(
                     painter = painterResource(R.drawable.baseline_info_24),
                     contentDescription = "Info",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = if (sessionState.value == SessionState.INACTIVE) MaterialTheme.colorScheme.onSurfaceVariant else Color.Transparent,
                 )
                 Spacer(
                     modifier = Modifier.padding(4.dp),
                 )
                 Text(
-                    text = "Press/hold physical buttons to start",
+                    text = if (sessionState.value == SessionState.INACTIVE) "Press/hold physical buttons to start" else "",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
