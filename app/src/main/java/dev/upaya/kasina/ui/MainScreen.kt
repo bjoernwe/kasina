@@ -122,7 +122,7 @@ fun MainScreen() {
                         .align(Alignment.Center),
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.baseline_lightbulb_circle_24),
+                        painter = painterResource(R.drawable.fire_svgrepo_com),
                         modifier = Modifier
                             .fillMaxSize(.4f)
                             .aspectRatio(1f, !isLandscape)
@@ -133,8 +133,7 @@ fun MainScreen() {
                                     bounded = false,
                                     color = MaterialTheme.colorScheme.secondaryContainer,
                                 ),
-                            )
-                        ,
+                            ),
                         contentDescription = "Lightbulb",
                         tint = sessionState.getColor(),
                     )
