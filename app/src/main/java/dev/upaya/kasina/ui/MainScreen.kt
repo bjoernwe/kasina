@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.upaya.kasina.R
-import dev.upaya.kasina.data.Session
 import dev.upaya.kasina.data.SessionState
 import dev.upaya.kasina.flashlight.FlashlightViewModel
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
@@ -58,15 +56,15 @@ fun MainScreen() {
     }
 
     val flashlightViewModel: FlashlightViewModel = hiltViewModel()
-    val recentSessions: State<List<Session>> = flashlightViewModel.recentSessions.collectAsState(initial = emptyList())
-    val sessionState = flashlightViewModel.sessionState.collectAsState(SessionState.INACTIVE)
+    val recentSessions by flashlightViewModel.recentSessions.collectAsState(initial = emptyList())
+    val sessionState by flashlightViewModel.sessionState.collectAsState(SessionState.INACTIVE)
     val currentSession by flashlightViewModel.currentSession.collectAsState(initial = null)
 
     var sessionDuration by remember { mutableStateOf(0.toDuration(DurationUnit.SECONDS)) }
 
     // Simulate a key press on value change
     val interactionSource = remember { MutableInteractionSource() }.also {
-        LaunchedEffect(sessionState.value) { it.simulatePress() }
+        LaunchedEffect(sessionState) { it.simulatePress() }
     }
 
     LaunchedEffect(currentSession) {
@@ -102,13 +100,13 @@ fun MainScreen() {
                 Icon(
                     painter = painterResource(R.drawable.baseline_info_24),
                     contentDescription = "Info",
-                    tint = if (sessionState.value == SessionState.INACTIVE) MaterialTheme.colorScheme.onSurfaceVariant else Color.Transparent,
+                    tint = if (sessionState == SessionState.INACTIVE) MaterialTheme.colorScheme.onSurfaceVariant else Color.Transparent,
                 )
                 Spacer(
                     modifier = Modifier.padding(4.dp),
                 )
                 Text(
-                    text = if (sessionState.value == SessionState.INACTIVE) "Press/hold physical buttons to start" else "",
+                    text = if (sessionState == SessionState.INACTIVE) "Press/hold physical buttons to start" else "",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -138,10 +136,10 @@ fun MainScreen() {
                             )
                         ,
                         contentDescription = "Lightbulb",
-                        tint = sessionState.value.getColor(),
+                        tint = sessionState.getColor(),
                     )
                     Text(
-                        text = if (sessionState.value == SessionState.ACTIVE_OFF) String.format(
+                        text = if (sessionState == SessionState.ACTIVE_OFF) String.format(
                             Locale.ROOT,"%02d:%02d:%02d",
                             sessionDuration.inWholeHours,
                             sessionDuration.inWholeMinutes % 60,
@@ -155,7 +153,7 @@ fun MainScreen() {
             }
 
             SessionStats(
-                sessions = recentSessions.value,
+                sessions = recentSessions,
                 modifier = Modifier
                     .weight(1f),
             )
