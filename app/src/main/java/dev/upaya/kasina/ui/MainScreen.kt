@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -42,6 +44,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
 
@@ -66,7 +69,15 @@ fun MainScreen() {
         }
     }
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Flashlight Kasina") },
+            )
+        },
+        modifier = Modifier
+            .fillMaxSize(),
+    ) { innerPadding ->
 
         Column(modifier = Modifier
             .padding(innerPadding)
@@ -106,7 +117,7 @@ fun MainScreen() {
                     Icon(
                         painter = painterResource(R.drawable.baseline_lightbulb_circle_24),
                         modifier = Modifier
-                            .fillMaxSize(.33f)
+                            .fillMaxSize(.4f)
                             .aspectRatio(1f, !isLandscape),
                         contentDescription = "Lightbulb",
                         tint = when (sessionState.value) {
