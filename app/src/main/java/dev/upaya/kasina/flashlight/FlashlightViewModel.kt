@@ -3,8 +3,10 @@ package dev.upaya.kasina.flashlight
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.upaya.kasina.data.SessionStateRepository
 import dev.upaya.kasina.inputkeys.InputKeyHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -12,12 +14,20 @@ import javax.inject.Inject
 class FlashlightViewModel @Inject constructor(
     private val inputKeyHandler: InputKeyHandler,
     private val flashlightStateController: FlashlightStateController,
+    private val sessionStateRepository: SessionStateRepository,
 ) : ViewModel() {
 
-    val isFlashlightOn = flashlightStateController.isFlashlightOn
+    val sessionState = sessionStateRepository.sessionState
+    val recentSessions = sessionStateRepository.recentSessions
+    val currentSession = sessionStateRepository.currentSession
 
     init {
-        flashlightStateController.start(scope = viewModelScope)
+        viewModelScope.launch {
+            flashlightStateController.startControllingFlashlightState()
+        }
+        viewModelScope.launch {
+            sessionStateRepository.startStoringSessions()
+        }
     }
 
     fun handleVolumeDownPress(scope: CoroutineScope) {
