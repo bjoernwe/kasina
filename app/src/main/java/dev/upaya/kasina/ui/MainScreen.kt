@@ -1,5 +1,6 @@
 package dev.upaya.kasina.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -10,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.upaya.kasina.data.SessionState.INACTIVE
@@ -26,6 +28,8 @@ fun MainScreen() {
     val sessionState by flashlightViewModel.sessionState.collectAsState(INACTIVE)
     val currentSession by flashlightViewModel.currentSession.collectAsState(initial = null)
 
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -36,13 +40,23 @@ fun MainScreen() {
             .fillMaxSize(),
     ) { innerPadding ->
 
-        MainLayoutPortrait(
-            currentSession = currentSession,
-            sessionState = sessionState,
-            recentSessions = recentSessions,
-            modifier = Modifier
-                .padding(innerPadding)
-        )
+        if (isLandscape) {
+            MainLayoutPortrait(
+                currentSession = currentSession,
+                sessionState = sessionState,
+                recentSessions = recentSessions,
+                modifier = Modifier
+                    .padding(innerPadding)
+            )
+        } else {
+            MainLayoutLandscape(
+                currentSession = currentSession,
+                sessionState = sessionState,
+                recentSessions = recentSessions,
+                modifier = Modifier
+                    .padding(innerPadding)
+            )
+        }
     }
 }
 
