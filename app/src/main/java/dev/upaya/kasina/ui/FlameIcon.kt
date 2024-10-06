@@ -1,5 +1,9 @@
 package dev.upaya.kasina.ui
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,9 +15,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,8 +38,9 @@ fun FlameIcon(
             .aspectRatio(1f)
     ) {
 
-        val flameOuterColor = sessionState.getColor()
-        val flameInnerColor = sessionState.getNextColor()
+        val animationSpec: AnimationSpec<Color> = spring(stiffness = Spring.StiffnessVeryLow, dampingRatio = Spring.DampingRatioHighBouncy)
+        val flameOuterColor by animateColorAsState(sessionState.getColor(), animationSpec = animationSpec, label = "outer flame color")
+        val flameInnerColor by animateColorAsState(sessionState.getNextColor(), animationSpec = animationSpec, label = "inner flame color")
 
         Canvas(
             modifier = Modifier
