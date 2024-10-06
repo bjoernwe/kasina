@@ -23,7 +23,7 @@ import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 fun SessionStats(
     sessions: List<Session?>,
     modifier: Modifier = Modifier,
-    numBars: Int = 10,
+    numBars: Int = 14,
 ) {
 
     Row(
@@ -51,8 +51,9 @@ fun SessionStats(
                     return@forEach
                 }
 
-                val onDuration = session.onDuration.coerceAtLeast(1f)
-                val offDuration = session.offDuration.coerceAtLeast(1f)
+                val onDuration = session.onDuration
+                val offDuration = session.offDuration
+                val totalDuration = onDuration + offDuration
                 val onDurationGap = filteredSessions.maxOnDuration() - onDuration
                 val offDurationGap = filteredSessions.maxOffDuration() - offDuration
 
@@ -75,7 +76,7 @@ fun SessionStats(
                         shape = RoundedCornerShape(50),
                         color = MaterialTheme.colorScheme.tertiaryContainer,
                         modifier = Modifier
-                            .weight(offDuration.coerceAtLeast(2f))
+                            .weight(totalDuration)
                             .fillMaxWidth()
                     ) {
                         Box (
@@ -85,8 +86,8 @@ fun SessionStats(
                                     Brush.verticalGradient(
                                         colorStops = arrayOf(
                                             0.0f to MaterialTheme.colorScheme.primaryContainer,
-                                            session.gradientTransitionPoint().minus(.1f) to MaterialTheme.colorScheme.tertiaryContainer,
-                                            session.gradientTransitionPoint().plus( .1f) to MaterialTheme.colorScheme.onTertiaryContainer,
+                                            session.gradientTransitionPoint().minus(.0f) to MaterialTheme.colorScheme.tertiaryContainer,
+                                            session.gradientTransitionPoint().plus( .0f) to MaterialTheme.colorScheme.onTertiaryContainer,
                                             1.0f to MaterialTheme.colorScheme.onTertiaryContainer,
                                         ),
                                     )
