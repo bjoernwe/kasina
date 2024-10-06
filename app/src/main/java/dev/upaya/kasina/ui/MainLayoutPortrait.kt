@@ -31,10 +31,12 @@ internal fun MainLayoutPortrait(
 
     val sessionActiveAlpha: Float by animateFloatAsState(if (sessionState == INACTIVE) 1f else 0f, label = "alpha")
 
-    Column(modifier = modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-        .padding(18.dp)
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+            .padding(18.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
         Surface(
@@ -49,13 +51,14 @@ internal fun MainLayoutPortrait(
 
         Box(
             modifier = Modifier
-                .weight(2f)
-                .fillMaxWidth(),
+                .weight(2f),
             contentAlignment = Alignment.Center
         ) {
             FlameAndTimer(
                 sessionState = sessionState,
                 currentSession = currentSession,
+                modifier = Modifier
+                    .fillMaxWidth(.45f)
             )
         }
 

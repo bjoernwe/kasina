@@ -33,10 +33,12 @@ internal fun MainLayoutLandscape(
 
     val sessionActiveAlpha: Float by animateFloatAsState(if (sessionState == INACTIVE) 1f else 0f, label = "alpha")
 
-    Row(modifier = modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-        .padding(18.dp)
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+            .padding(18.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
 
         Column(modifier = Modifier
@@ -78,6 +80,8 @@ internal fun MainLayoutLandscape(
             FlameAndTimer(
                 sessionState = sessionState,
                 currentSession = currentSession,
+                modifier = Modifier
+                    .fillMaxHeight(.75f)
             )
         }
 

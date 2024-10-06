@@ -2,7 +2,6 @@ package dev.upaya.kasina.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
@@ -42,12 +41,11 @@ internal fun FlameAndTimer(
 
     Column(
         modifier = modifier
-            .wrapContentHeight()
     ) {
         FlameIcon(
             sessionState = sessionState,
             modifier = Modifier
-                .fillMaxWidth(.45f)
+                .weight(1f)
                 .align(Alignment.CenterHorizontally)
         )
         Spacer(
@@ -62,6 +60,7 @@ internal fun FlameAndTimer(
             ) else "",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
+                .wrapContentHeight()
                 .align(Alignment.CenterHorizontally)
         )
     }
