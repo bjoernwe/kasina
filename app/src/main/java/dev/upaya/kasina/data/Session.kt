@@ -25,11 +25,11 @@ data class Session(
     val isIncomplete: Boolean
         get() = timestampStart == null || timestampEnd == null
 
-    val onDuration: Long
-        get() = if (timestampStart == null) 0 else (timestampStart - timestampFlash)
+    val onDuration: Float
+        get() = if (timestampStart == null) 0f else (timestampStart - timestampFlash).div(1000f)
 
-    val offDuration: Long
-        get() = if (timestampStart == null || timestampEnd == null) 0 else (timestampEnd - timestampStart)
+    val offDuration: Float
+        get() = if (timestampStart == null || timestampEnd == null) 0f else (timestampEnd - timestampStart).div(1000f)
 
     val start: Instant?
         get() = timestampStart?.let { Instant.ofEpochMilli(it) }

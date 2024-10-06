@@ -107,7 +107,7 @@ fun MainScreen() {
                     FlameIcon(
                         sessionState = sessionState,
                         modifier = Modifier
-                            .fillMaxWidth(.4f)
+                            .fillMaxWidth(.5f)
                             .align(Alignment.CenterHorizontally)
                     )
                     Spacer(
