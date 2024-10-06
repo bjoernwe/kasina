@@ -1,5 +1,6 @@
 package dev.upaya.kasina.ui
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,13 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.upaya.kasina.R
-import dev.upaya.kasina.data.SessionState
+import dev.upaya.kasina.data.SessionState.ACTIVE_OFF
+import dev.upaya.kasina.data.SessionState.INACTIVE
 import dev.upaya.kasina.flashlight.FlashlightViewModel
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 import kotlinx.coroutines.delay
@@ -47,10 +49,12 @@ fun MainScreen() {
 
     val flashlightViewModel: FlashlightViewModel = hiltViewModel()
     val recentSessions by flashlightViewModel.recentSessions.collectAsState(initial = emptyList())
-    val sessionState by flashlightViewModel.sessionState.collectAsState(SessionState.INACTIVE)
+    val sessionState by flashlightViewModel.sessionState.collectAsState(INACTIVE)
     val currentSession by flashlightViewModel.currentSession.collectAsState(initial = null)
 
     var sessionDuration by remember { mutableStateOf(0.toDuration(DurationUnit.SECONDS)) }
+
+    val sessionActiveAlpha: Float by animateFloatAsState(if (sessionState == INACTIVE) 1f else 0f, label = "alpha")
 
     LaunchedEffect(currentSession) {
         while (true) {
@@ -81,6 +85,7 @@ fun MainScreen() {
                 color = MaterialTheme.colorScheme.surfaceContainerLow,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .graphicsLayer(alpha = sessionActiveAlpha)
             ) {
                 Row(
                     modifier = Modifier
@@ -90,13 +95,13 @@ fun MainScreen() {
                     Icon(
                         painter = painterResource(R.drawable.baseline_info_24),
                         contentDescription = "Info",
-                        tint = if (sessionState == SessionState.INACTIVE) MaterialTheme.colorScheme.onSurfaceVariant else Color.Transparent,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(
                         modifier = Modifier.padding(4.dp),
                     )
                     Text(
-                        text = if (sessionState == SessionState.INACTIVE) "Press/hold physical buttons to start" else "",
+                        text = "Press/hold physical buttons to start",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -124,7 +129,7 @@ fun MainScreen() {
                         modifier = Modifier.padding(8.dp),
                     )
                     Text(
-                        text = if (sessionState == SessionState.ACTIVE_OFF) String.format(
+                        text = if (sessionState == ACTIVE_OFF) String.format(
                             Locale.ROOT,"%02d:%02d:%02d",
                             sessionDuration.inWholeHours,
                             sessionDuration.inWholeMinutes % 60,
