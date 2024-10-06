@@ -34,7 +34,6 @@ import dev.upaya.kasina.data.SessionState
 import dev.upaya.kasina.flashlight.FlashlightViewModel
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 import kotlinx.coroutines.delay
-import java.time.Instant
 import java.util.Locale
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -53,9 +52,7 @@ fun MainScreen() {
 
     LaunchedEffect(currentSession) {
         while (true) {
-            if (currentSession != null && currentSession!!.start != null) {
-                sessionDuration = (Instant.now().toEpochMilli() - currentSession!!.start!!.toEpochMilli()).toDuration(DurationUnit.MILLISECONDS)
-            }
+            sessionDuration = calcSessionDuration(currentSession)
             delay(100L)
         }
     }
