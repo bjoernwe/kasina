@@ -1,12 +1,6 @@
 package dev.upaya.kasina.ui
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,7 +13,6 @@ import dev.upaya.kasina.flashlight.FlashlightViewModel
 import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
 
@@ -30,23 +23,12 @@ fun MainScreen() {
 
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Flash Kasina") },
-            )
-        },
-        modifier = Modifier
-            .fillMaxSize(),
-    ) { innerPadding ->
-
         if (isLandscape) {
             MainLayoutPortrait(
                 currentSession = currentSession,
                 sessionState = sessionState,
                 recentSessions = recentSessions,
                 modifier = Modifier
-                    .padding(innerPadding)
             )
         } else {
             MainLayoutLandscape(
@@ -54,10 +36,8 @@ fun MainScreen() {
                 sessionState = sessionState,
                 recentSessions = recentSessions,
                 modifier = Modifier
-                    .padding(innerPadding)
             )
         }
-    }
 }
 
 

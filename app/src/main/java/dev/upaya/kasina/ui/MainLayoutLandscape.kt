@@ -5,12 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,57 +35,67 @@ internal fun MainLayoutLandscape(
 
     val sessionActiveAlpha: Float by animateFloatAsState(if (sessionState == INACTIVE) 1f else 0f, label = "alpha")
 
-    Row(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-            .padding(18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
+    ) { innerPadding ->
 
-        Column(modifier = Modifier
-            .weight(1f)
-            .fillMaxHeight()
+        Row(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .padding(18.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
 
-            Surface(
-                shape = RoundedCornerShape(15),
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .graphicsLayer(alpha = sessionActiveAlpha)
+                    .weight(1f)
+                    .fillMaxHeight()
             ) {
-                InfoText()
+
+                Surface(
+                    shape = RoundedCornerShape(15),
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .graphicsLayer(alpha = sessionActiveAlpha)
+                ) {
+                    InfoText()
+                }
+
+                Spacer(modifier = Modifier.fillMaxHeight(.15f))
+
+                Surface(
+                    shape = RoundedCornerShape(15),
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    SessionStats(
+                        sessions = recentSessions,
+                        modifier = Modifier
+                            .padding(18.dp)
+                    )
+                }
+
             }
 
-            Surface(
-                shape = RoundedCornerShape(15),
-                color = MaterialTheme.colorScheme.surfaceContainerLowest,
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.Center
             ) {
-                SessionStats(
-                    sessions = recentSessions,
+                FlameAndTimer(
+                    sessionState = sessionState,
+                    currentSession = currentSession,
                     modifier = Modifier
-                        .padding(18.dp)
+                        .fillMaxHeight(.6f)
                 )
             }
 
         }
-
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            contentAlignment = Alignment.Center
-        ) {
-            FlameAndTimer(
-                sessionState = sessionState,
-                currentSession = currentSession,
-                modifier = Modifier
-                    .fillMaxHeight(.7f)
-            )
-        }
-
     }
 }

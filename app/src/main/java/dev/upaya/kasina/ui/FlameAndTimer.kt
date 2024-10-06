@@ -1,7 +1,9 @@
 package dev.upaya.kasina.ui
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +43,7 @@ internal fun FlameAndTimer(
 
     Column(
         modifier = modifier
-            //.wrapContentHeight()
+            .height(IntrinsicSize.Min)
     ) {
         FlameIcon(
             sessionState = sessionState,
