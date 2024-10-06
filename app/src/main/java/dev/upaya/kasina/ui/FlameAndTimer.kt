@@ -41,12 +41,12 @@ internal fun FlameAndTimer(
 
     Column(
         modifier = modifier
+            //.wrapContentHeight()
     ) {
         FlameIcon(
             sessionState = sessionState,
             modifier = Modifier
                 .weight(1f)
-                .align(Alignment.CenterHorizontally)
         )
         Spacer(
             modifier = Modifier.padding(8.dp),

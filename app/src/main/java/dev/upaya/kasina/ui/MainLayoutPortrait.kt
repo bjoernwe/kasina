@@ -52,7 +52,7 @@ internal fun MainLayoutPortrait(
         Box(
             modifier = Modifier
                 .weight(2f),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             FlameAndTimer(
                 sessionState = sessionState,

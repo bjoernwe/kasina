@@ -30,8 +30,8 @@ import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 
 @Composable
 fun FlameIcon(
-    modifier: Modifier = Modifier,
     sessionState: SessionState,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier

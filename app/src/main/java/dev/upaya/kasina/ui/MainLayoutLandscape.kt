@@ -81,7 +81,7 @@ internal fun MainLayoutLandscape(
                 sessionState = sessionState,
                 currentSession = currentSession,
                 modifier = Modifier
-                    .fillMaxHeight(.75f)
+                    .fillMaxHeight(.7f)
             )
         }
 
