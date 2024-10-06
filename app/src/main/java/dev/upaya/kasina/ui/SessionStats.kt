@@ -4,8 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -33,9 +33,6 @@ fun SessionStats(
 
         val filteredSessions = sessions.take(numBars)
 
-        val maxOnDuration  = filteredSessions.maxOfOrNull { it?.onDuration  ?: 1f } ?: 1f
-        val maxOffDuration = filteredSessions.maxOfOrNull { it?.offDuration ?: 1f } ?: 1f
-
         filteredSessions
             .asReversed()
             .toMutableList()
@@ -56,8 +53,8 @@ fun SessionStats(
 
                 val onDuration = session.onDuration.coerceAtLeast(1f)
                 val offDuration = session.offDuration.coerceAtLeast(1f)
-                val onDurationGap = maxOnDuration - onDuration
-                val offDurationGap = maxOffDuration - offDuration
+                val onDurationGap = filteredSessions.maxOnDuration() - onDuration
+                val offDurationGap = filteredSessions.maxOffDuration() - offDuration
 
                 Column(
                     modifier = Modifier
@@ -73,37 +70,29 @@ fun SessionStats(
                         ) { }
                     }
 
-                    // OFF duration
+                    // OFF/ON bar
                     Surface(
-                        shape = RoundedCornerShape(50, 50),
+                        shape = RoundedCornerShape(50),
                         color = MaterialTheme.colorScheme.tertiaryContainer,
                         modifier = Modifier
-                            .weight(offDuration.coerceAtLeast(1f))
+                            .weight(offDuration.coerceAtLeast(2f))
                             .fillMaxWidth()
-                    ) { }
-
-                    Box (
-                        modifier = Modifier
-                            .height(16.dp)
-                            .fillMaxWidth()
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.tertiaryContainer,
-                                        MaterialTheme.colorScheme.onTertiaryContainer
-                                    ),
+                    ) {
+                        Box (
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colorStops = arrayOf(
+                                            0.0f to MaterialTheme.colorScheme.primaryContainer,
+                                            session.gradientTransitionPoint().minus(.1f) to MaterialTheme.colorScheme.tertiaryContainer,
+                                            session.gradientTransitionPoint().plus( .1f) to MaterialTheme.colorScheme.onTertiaryContainer,
+                                            1.0f to MaterialTheme.colorScheme.onTertiaryContainer,
+                                        ),
+                                    )
                                 )
-                            )
-                    ) { }
-
-                    // ON duration
-                    Surface(
-                        shape = RoundedCornerShape(0, 0, 50, 50),
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        modifier = Modifier
-                            .weight(onDuration.coerceAtLeast(1f))
-                            .fillMaxWidth()
-                    ) { }
+                        ) { }
+                    }
 
                     // ON duration filler
                     if (onDurationGap > 0) {
