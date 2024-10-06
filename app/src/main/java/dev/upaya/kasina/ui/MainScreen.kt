@@ -33,7 +33,7 @@ fun MainScreen() {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Flashlight Kasina") },
+                title = { Text("Flash Kasina") },
             )
         },
         modifier = Modifier
