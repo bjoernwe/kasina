@@ -1,14 +1,10 @@
 package dev.upaya.kasina.ui
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,7 +15,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,22 +44,12 @@ import kotlin.time.toDuration
 @Composable
 fun MainScreen() {
 
-    val configuration = LocalConfiguration.current
-    val isLandscape = remember {
-        configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    }
-
     val flashlightViewModel: FlashlightViewModel = hiltViewModel()
     val recentSessions by flashlightViewModel.recentSessions.collectAsState(initial = emptyList())
     val sessionState by flashlightViewModel.sessionState.collectAsState(SessionState.INACTIVE)
     val currentSession by flashlightViewModel.currentSession.collectAsState(initial = null)
 
     var sessionDuration by remember { mutableStateOf(0.toDuration(DurationUnit.SECONDS)) }
-
-    // Simulate a key press on value change
-    val interactionSource = remember { MutableInteractionSource() }.also {
-        LaunchedEffect(sessionState) { it.simulatePress() }
-    }
 
     LaunchedEffect(currentSession) {
         while (true) {
@@ -119,23 +103,18 @@ fun MainScreen() {
             ) {
                 Column(
                     modifier = Modifier
-                        .align(Alignment.Center),
+                        .align(Alignment.Center)
+                        .fillMaxWidth()
+                        .wrapContentHeight()
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.fire_svgrepo_com),
+                    FlameIcon(
+                        sessionState = sessionState,
                         modifier = Modifier
-                            .fillMaxSize(.4f)
-                            .aspectRatio(1f, !isLandscape)
-                            .clickable(
-                                onClick = {},
-                                interactionSource = interactionSource,
-                                indication = ripple(
-                                    bounded = false,
-                                    color = MaterialTheme.colorScheme.secondaryContainer,
-                                ),
-                            ),
-                        contentDescription = "Lightbulb",
-                        tint = sessionState.getColor(),
+                            .fillMaxWidth(.4f)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    Spacer(
+                        modifier = Modifier.padding(8.dp),
                     )
                     Text(
                         text = if (sessionState == SessionState.ACTIVE_OFF) String.format(

@@ -18,6 +18,15 @@ internal fun SessionState.getColor(): Color =
     }
 
 
+@Composable
+internal fun SessionState.getNextColor(): Color =
+    when (this) {
+        SessionState.INACTIVE -> MaterialTheme.colorScheme.onTertiaryContainer
+        SessionState.ACTIVE_ON -> MaterialTheme.colorScheme.tertiaryContainer
+        SessionState.ACTIVE_OFF -> MaterialTheme.colorScheme.primaryContainer
+    }
+
+
 internal suspend fun MutableInteractionSource.simulatePress() {
     val press = PressInteraction.Press(Offset.Zero)
     this.emit(press)
