@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -71,30 +73,38 @@ fun MainScreen() {
             .padding(innerPadding)
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-            .padding(24.dp)
+            .padding(18.dp)
         ) {
 
-            Row(
+            Surface(
+                shape = RoundedCornerShape(15),
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
                 modifier = Modifier
-                    .wrapContentHeight(),
+                    .fillMaxWidth()
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_info_24),
-                    contentDescription = "Info",
-                    tint = if (sessionState == SessionState.INACTIVE) MaterialTheme.colorScheme.onSurfaceVariant else Color.Transparent,
-                )
-                Spacer(
-                    modifier = Modifier.padding(4.dp),
-                )
-                Text(
-                    text = if (sessionState == SessionState.INACTIVE) "Press/hold physical buttons to start" else "",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Row(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .padding(12.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_info_24),
+                        contentDescription = "Info",
+                        tint = if (sessionState == SessionState.INACTIVE) MaterialTheme.colorScheme.onSurfaceVariant else Color.Transparent,
+                    )
+                    Spacer(
+                        modifier = Modifier.padding(4.dp),
+                    )
+                    Text(
+                        text = if (sessionState == SessionState.INACTIVE) "Press/hold physical buttons to start" else "",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
 
             Box(
                 modifier = Modifier
-                    .weight(3f)
+                    .weight(2f)
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
@@ -127,11 +137,19 @@ fun MainScreen() {
                 }
             }
 
-            SessionStats(
-                sessions = recentSessions,
+            Surface(
+                shape = RoundedCornerShape(15),
+                color = MaterialTheme.colorScheme.surfaceContainerLowest,
                 modifier = Modifier
-                    .weight(1f),
-            )
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                SessionStats(
+                    sessions = recentSessions,
+                    modifier = Modifier
+                        .padding(18.dp)
+                )
+            }
         }
     }
 }
