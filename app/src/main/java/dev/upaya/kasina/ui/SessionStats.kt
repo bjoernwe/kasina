@@ -13,6 +13,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.upaya.kasina.data.Session
@@ -85,8 +86,9 @@ fun SessionStats(
                                     Brush.verticalGradient(
                                         colorStops = arrayOf(
                                             0.0f to MaterialTheme.colorScheme.primaryContainer,
-                                            session.gradientTransitionPoint().minus(.0f) to MaterialTheme.colorScheme.tertiaryContainer,
-                                            session.gradientTransitionPoint().plus( .0f) to MaterialTheme.colorScheme.onTertiaryContainer,
+                                            0.6f to MaterialTheme.colorScheme.tertiaryContainer,
+                                            session.gradientTransitionPoint() to lerp(MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.onTertiaryContainer, .25f),
+                                            session.gradientTransitionPoint().plus( filteredSessions.localFraction(i, .05f)) to MaterialTheme.colorScheme.onTertiaryContainer,
                                             1.0f to MaterialTheme.colorScheme.onTertiaryContainer,
                                         ),
                                     )

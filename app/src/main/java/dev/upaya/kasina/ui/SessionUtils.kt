@@ -23,6 +23,11 @@ internal fun Session?.offWeight(): Float {
 }
 
 
+internal fun Session?.totalWeight(): Float {
+    return this.onWeight() + this.offWeight()
+}
+
+
 internal fun List<Session?>.maxOnDuration(): Float {
     return this.maxOfOrNull { it?.onDuration ?: 0f } ?: 0f
 }
@@ -30,6 +35,11 @@ internal fun List<Session?>.maxOnDuration(): Float {
 
 internal fun List<Session?>.maxOffDuration(): Float {
     return this.maxOfOrNull { it?.offDuration ?: 0f } ?: 0f
+}
+
+
+internal fun List<Session?>.maxTotalWeight(): Float {
+    return this.maxOnDuration() + this.maxOffDuration()
 }
 
 
@@ -45,6 +55,11 @@ internal fun List<Session?>.offGapWeight(i: Int): Float {
 
 internal fun List<Session?>.totalOnOffWeight(i: Int): Float {
     return this[i].onWeight() + this[i].offWeight()
+}
+
+
+internal fun List<Session?>.localFraction(i: Int, globalFraction: Float): Float {
+    return globalFraction * (this.maxTotalWeight() / this[i].totalWeight())
 }
 
 
