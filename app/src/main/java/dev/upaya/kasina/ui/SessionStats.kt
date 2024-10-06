@@ -23,7 +23,7 @@ import dev.upaya.kasina.ui.theme.FlashKasinaTheme
 fun SessionStats(
     sessions: List<Session?>,
     modifier: Modifier = Modifier,
-    numBars: Int = 14,
+    numBars: Int = 15,
 ) {
 
     Row(
@@ -31,16 +31,17 @@ fun SessionStats(
             .fillMaxWidth()
     ) {
 
-        val filteredSessions = sessions.take(numBars)
-
-        filteredSessions
+        val filteredSessions = sessions
+            .take(numBars)
             .asReversed()
             .toMutableList()
             .also {
                 val numMissingValues = (numBars - it.size).coerceAtLeast(0)
                 val missingValues = List(numMissingValues) { null }
                 it.addAll( missingValues )
-            }.forEach { session ->
+            }
+
+        filteredSessions.forEachIndexed { i, session ->
 
                 if (session == null) {
                     Column(
@@ -48,14 +49,12 @@ fun SessionStats(
                             .weight(1f)
                             .padding(2.dp)
                     ) { }
-                    return@forEach
+                    return@forEachIndexed
                 }
 
-                val onDuration = session.onDuration
-                val offDuration = session.offDuration
-                val totalDuration = onDuration + offDuration
-                val onDurationGap = filteredSessions.maxOnDuration() - onDuration
-                val offDurationGap = filteredSessions.maxOffDuration() - offDuration
+                val onGapWeight = filteredSessions.onGapWeight(i)
+                val offGapWeight = filteredSessions.offGapWeight(i)
+                val totalOnOffWeight = filteredSessions.totalOnOffWeight(i)
 
                 Column(
                     modifier = Modifier
@@ -64,10 +63,10 @@ fun SessionStats(
                 ) {
 
                     // OFF duration filler
-                    if (offDurationGap > 0) {
+                    if (offGapWeight > 0) {
                         Surface(
                             modifier = Modifier
-                                .weight(offDurationGap)
+                                .weight(offGapWeight)
                         ) { }
                     }
 
@@ -76,7 +75,7 @@ fun SessionStats(
                         shape = RoundedCornerShape(50),
                         color = MaterialTheme.colorScheme.tertiaryContainer,
                         modifier = Modifier
-                            .weight(totalDuration)
+                            .weight(totalOnOffWeight)
                             .fillMaxWidth()
                     ) {
                         Box (
@@ -96,10 +95,10 @@ fun SessionStats(
                     }
 
                     // ON duration filler
-                    if (onDurationGap > 0) {
+                    if (onGapWeight > 0) {
                         Surface(
                             modifier = Modifier
-                                .weight(onDurationGap)
+                                .weight(onGapWeight)
                         ) { }
                     }
                 }
