@@ -92,6 +92,7 @@ internal fun MainLayoutLandscape(
                     sessionState = sessionState,
                     currentSession = currentSession,
                     modifier = Modifier
+                        .padding(top = 18.dp)
                         .fillMaxHeight(.6f)
                 )
             }
