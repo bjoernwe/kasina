@@ -1,4 +1,4 @@
-package dev.upaya.kasina.ui
+package dev.upaya.kasina.ui.composables
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction

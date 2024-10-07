@@ -1,4 +1,4 @@
-package dev.upaya.kasina.ui
+package dev.upaya.kasina.ui.composables
 
 import dev.upaya.kasina.data.Session
 

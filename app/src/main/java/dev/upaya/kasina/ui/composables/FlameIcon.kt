@@ -1,4 +1,4 @@
-package dev.upaya.kasina.ui
+package dev.upaya.kasina.ui.composables
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
