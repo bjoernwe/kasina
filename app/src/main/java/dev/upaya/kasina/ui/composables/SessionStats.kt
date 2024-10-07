@@ -79,17 +79,22 @@ fun SessionStats(
                             .weight(totalOnOffWeight)
                             .fillMaxWidth()
                     ) {
+                        val gradientPoint0 = 0f
+                        val gradientPointX = session.gradientTransitionPoint()
+                        val gradientPoint1 = gradientPointX.times(.7f)
+                        val gradientPointY = session.gradientTransitionPoint().plus( filteredSessions.localFraction(i, .05f))
+                        val gradientPointZ = 1f
                         Box (
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(
                                     Brush.verticalGradient(
                                         colorStops = arrayOf(
-                                            0.0f to MaterialTheme.colorScheme.primaryContainer,
-                                            0.6f to MaterialTheme.colorScheme.tertiaryContainer,
-                                            session.gradientTransitionPoint() to lerp(MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.onTertiaryContainer, .25f),
-                                            session.gradientTransitionPoint().plus( filteredSessions.localFraction(i, .05f)) to MaterialTheme.colorScheme.onTertiaryContainer,
-                                            1.0f to MaterialTheme.colorScheme.onTertiaryContainer,
+                                            gradientPoint0 to MaterialTheme.colorScheme.primaryContainer,
+                                            gradientPoint1 to MaterialTheme.colorScheme.tertiaryContainer,
+                                            gradientPointX to lerp(MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.onTertiaryContainer, .25f),
+                                            gradientPointY to MaterialTheme.colorScheme.onTertiaryContainer,
+                                            gradientPointZ to MaterialTheme.colorScheme.onTertiaryContainer,
                                         ),
                                     )
                                 )
