@@ -16,6 +16,7 @@ import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -56,8 +57,13 @@ fun FlameIcon(
         }
 
         // Simulate a key press on value change
+        val previousSessionState = remember { mutableStateOf(sessionState) }
         val interactionSource = remember { MutableInteractionSource() }.also {
-            LaunchedEffect(sessionState) { it.simulatePress() }
+            LaunchedEffect(sessionState) {
+                if (previousSessionState.value != sessionState)
+                    it.simulatePress()
+                previousSessionState.value = sessionState
+            }
         }
 
         Icon(
