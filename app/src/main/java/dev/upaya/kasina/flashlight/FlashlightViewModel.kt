@@ -17,6 +17,7 @@ class FlashlightViewModel @Inject constructor(
     private val sessionStateRepository: SessionStateRepository,
 ) : ViewModel() {
 
+    val isFlashlightAvailable = flashlightStateController.isFlashlightAvailable
     val sessionState = sessionStateRepository.sessionState
     val recentSessions = sessionStateRepository.recentSessions
     val currentSession = sessionStateRepository.currentSession

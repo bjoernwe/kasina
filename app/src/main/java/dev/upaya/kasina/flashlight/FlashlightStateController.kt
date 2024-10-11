@@ -28,6 +28,8 @@ class FlashlightStateController @Inject constructor(
     private val inputKeyHandler: InputKeyHandler,
 ) {
 
+    val isFlashlightAvailable = flashlight.flashlightAvailable
+
     private var _flashlightState = MutableStateFlow(OFF)
     val flashlightState: StateFlow<FlashlightState> = _flashlightState
 
