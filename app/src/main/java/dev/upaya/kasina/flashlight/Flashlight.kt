@@ -4,9 +4,6 @@ import android.content.Context
 import android.content.Context.CAMERA_SERVICE
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
-import com.google.firebase.Firebase
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.analytics
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -44,8 +41,6 @@ class Flashlight @Inject constructor(
         }
     }
 
-    private val firebaseAnalytics: FirebaseAnalytics = Firebase.analytics
-
     init {
         cameraManager.registerTorchCallback(torchCallback, null)
     }
@@ -59,8 +54,6 @@ class Flashlight @Inject constructor(
         GlobalScope.launch(dispatcher) {
             cameraManager.setTorchMode(cameraId, true)
         }
-
-        firebaseAnalytics.logEvent("flashlight_on", null)
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -72,7 +65,5 @@ class Flashlight @Inject constructor(
         GlobalScope.launch(dispatcher) {
             cameraManager.setTorchMode(cameraId, false)
         }
-
-        firebaseAnalytics.logEvent("flashlight_off", null)
     }
 }
