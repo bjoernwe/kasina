@@ -24,7 +24,7 @@ import dev.upaya.kasina.data.Session
 import dev.upaya.kasina.data.SessionState
 import dev.upaya.kasina.data.SessionState.INACTIVE
 import dev.upaya.kasina.ui.composables.FlameAndTimer
-import dev.upaya.kasina.ui.composables.InfoText
+import dev.upaya.kasina.ui.composables.InfoErrorSurface
 import dev.upaya.kasina.ui.composables.SessionStats
 
 
@@ -33,6 +33,7 @@ internal fun MainLayoutLandscape(
     currentSession: Session?,
     sessionState: SessionState,
     recentSessions: List<Session>,
+    isFlashlightAvailable: Boolean,
     modifier: Modifier = Modifier,
 ) {
 
@@ -58,15 +59,12 @@ internal fun MainLayoutLandscape(
                     .fillMaxHeight()
             ) {
 
-                Surface(
-                    shape = RoundedCornerShape(15),
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                InfoErrorSurface(
+                    isFlashlightAvailable = isFlashlightAvailable,
                     modifier = Modifier
                         .fillMaxWidth()
                         .graphicsLayer(alpha = sessionActiveAlpha)
-                ) {
-                    InfoText()
-                }
+                )
 
                 Spacer(modifier = Modifier.fillMaxHeight(.15f))
 

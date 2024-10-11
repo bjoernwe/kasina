@@ -28,6 +28,7 @@ fun MainScreen() {
                 currentSession = currentSession,
                 sessionState = sessionState,
                 recentSessions = recentSessions,
+                isFlashlightAvailable = flashlightViewModel.isFlashlightAvailable,
                 modifier = Modifier
             )
         } else {
@@ -35,6 +36,7 @@ fun MainScreen() {
                 currentSession = currentSession,
                 sessionState = sessionState,
                 recentSessions = recentSessions,
+                isFlashlightAvailable = flashlightViewModel.isFlashlightAvailable,
                 modifier = Modifier
             )
         }
