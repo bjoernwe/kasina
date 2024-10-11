@@ -30,9 +30,17 @@ class Flashlight @Inject constructor(
         get() = !turnedOn
 
     private val cameraManager = context.getSystemService(CAMERA_SERVICE) as CameraManager
-    private val cameraId = cameraManager.cameraIdList.first { id ->
-        cameraManager.getCameraCharacteristics(id)[CameraCharacteristics.FLASH_INFO_AVAILABLE] == true
+    private val cameraId = cameraManager.cameraIdList.let { ids ->
+        try {
+            ids.firstOrNull { id -> cameraManager.getCameraCharacteristics(id)[CameraCharacteristics.FLASH_INFO_AVAILABLE] == true }
+        } catch (e: NoSuchElementException) {
+            return@let null
+        }
     }
+
+    val flashlightAvailable: Boolean
+        get() = cameraId != null
+
     private val torchCallback = object : CameraManager.TorchCallback() {
         override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
             if (events.value == enabled)
@@ -48,22 +56,28 @@ class Flashlight @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     fun turnOn(dispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
+        if (!flashlightAvailable)
+            return
+
         if (turnedOn)
             return
 
         GlobalScope.launch(dispatcher) {
-            cameraManager.setTorchMode(cameraId, true)
+            cameraManager.setTorchMode(cameraId!!, true)
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun turnOff(dispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
+        if (!flashlightAvailable)
+            return
+
         if (turnedOff)
             return
 
         GlobalScope.launch(dispatcher) {
-            cameraManager.setTorchMode(cameraId, false)
+            cameraManager.setTorchMode(cameraId!!, false)
         }
     }
 }
