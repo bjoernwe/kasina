@@ -12,6 +12,6 @@ interface SessionDao {
     @Insert
     suspend fun insert(vararg sessions: Session)
 
-    @Query("SELECT * FROM sessions ORDER BY timestamp_flash DESC LIMIT :limit")
-    fun recentSessions(limit: Int = 1): Flow<List<Session>>
+    @Query("SELECT * FROM sessions WHERE (timestamp_end - timestamp_flash) >= :minLength ORDER BY timestamp_flash DESC LIMIT :limit")
+    fun recentSessions(limit: Int = 1, minLength: Long = 1000): Flow<List<Session>>
 }

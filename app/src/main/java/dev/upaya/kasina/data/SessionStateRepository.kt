@@ -37,7 +37,7 @@ class SessionStateRepository @Inject constructor(
     private val sessionDao = db.sessionDao()
 
     // We could emit sessions directly, but this way the DB is the single source of truth
-    val recentSessions = sessionDao.recentSessions(limit = 15)
+    val recentSessions = sessionDao.recentSessions(limit = 15, minLength = 5000)
 
     private val _currentSession = MutableStateFlow<Session?>(null)
     val currentSession: StateFlow<Session?> = _currentSession
