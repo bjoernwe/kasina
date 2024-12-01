@@ -1,5 +1,5 @@
 [versions]
-firebaseBom = "33.4.0"
+firebaseBom = "33.6.0"
 hiltAndroid = "2.52"
 hiltAndroidCompiler = "2.52"
 hiltNavigationCompose = "1.2.0"
